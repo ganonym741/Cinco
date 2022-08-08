@@ -5,7 +5,6 @@ import (
 	"log"
 	"strconv"
 
-	"gitlab.com/cinco/app/model"
 	"gitlab.com/cinco/configs"
 
 	"gorm.io/driver/postgres"
@@ -37,10 +36,10 @@ func ConnectDB() {
 	fmt.Println("Connection Opened to Database")
 
 	// Migrate the database
-	err = DB.AutoMigrate(&model.Account{}, &model.User{}, &model.Cashflow{})
-	if err != nil {
-		panic("[Gorm] Database failed to migrate!")
-	}
-
-	fmt.Println("Database Migrated")
+	//err = DB.AutoMigrate(&model.Account{}, &model.User{}, &model.Cashflow{})
+	//if err != nil {
+	//	panic("[Gorm] Database failed to migrate!")
+	//}
+	//
+	//fmt.Println("Database Migrated")
 }

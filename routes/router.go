@@ -10,7 +10,7 @@ import (
 func AllRouter(app *fiber.App) {
 	api := app.Group("/api", logger.New())
 
-	// api.Post("/user/register", Handler.UserRegister)
+	api.Post("/user/register", Handler.UserRegister)
 	// api.Post("/user/login", Handler.UserLogin)
 	// api.Post("/user/logout", Handler.UserLogout)
 	api.Get("/user/profile", Handler.UserProfile)
