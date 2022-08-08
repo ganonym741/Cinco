@@ -10,6 +10,7 @@ DB_NAME=cinco
 
 
 ### INSTAL GOLANG MIGRATE
+[Release Downloads](https://github.com/golang-migrate/migrate/releases)
 ```shell
 curl -L https://github.com/golang-migrate/migrate/releases/download/$version/migrate.$platform-amd64.tar.gz | tar xvz
 ```
