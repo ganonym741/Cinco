@@ -1,7 +1,13 @@
 # CINCO
 ### CREATE DATABASEUSING POSTGRES
-
 > Create database "**cinco**"
+
+create file **.env** then fill these to configure Makefile:
+>DB_USER=postgres
+DB_PASSWORD=password
+DB_PORT=5432
+DB_NAME=cinco
+
 
 ### INSTAL GOLANG MIGRATE
 ```shell
