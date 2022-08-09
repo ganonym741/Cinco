@@ -69,11 +69,9 @@ func UserProfile(c *fiber.Ctx) error {
 	db := db.DB
 	var user model.User
 
-	if err := c.ParamsParser(user.Id); err != nil {
-		return err
-	}
+	userID := c.Params("id");
 
-	db.Where("id = ?", user.Id).Find(&user)
+	db.Where("id = ?", userID).Find(&user)
 
 	if user.Id == "" {
 		return c.Status(401).JSON(fiber.Map{"status": "error", "message": "User data not found", "data": nil})
