@@ -1,17 +1,28 @@
 package handler
 
 import (
+	"context"
+
 	"github.com/gofiber/fiber/v2"
-	"gitlab.com/cinco/app/model"
-	db "gitlab.com/cinco/pkg/postgres"
+	"gitlab.com/cinco/app/service"
 )
 
-type CincoUser interface {
-	UserRegister()
-	UserLogin()
-	UserLogout()
-	UserProfile()
+type Handler struct {
+	service service.Service
 }
+
+func NewHandler(s service.Service) Handler {
+	return Handler{
+		service: s,
+	}
+}
+
+// type CincoUser interface {
+// 	UserRegister()
+// 	UserLogin()
+// 	UserLogout()
+// 	UserProfile()
+// }
 
 // func UserRegister(c *fiber.Ctx) error {
 
@@ -22,15 +33,16 @@ type CincoUser interface {
 // func UserLogout(c *fiber.Ctx) error {
 
 // }
-func UserProfile(c *fiber.Ctx) error {
-	db := db.DB
-	var user model.User
+func (h Handler) UserProfile(c *fiber.Ctx) error {
+	ctx := context.Background()
+	params := c.Params("userId")
 
-	db.Find(&user)
-
-	if user.UserId == "" {
-		return c.Status(401).JSON(fiber.Map{"status": "error", "message": "User data not found", "data": nil})
+	data, err := h.service.GetUserDetail(ctx, params)
+	if err != nil {
+		return c.Status(201).
+			JSON(fiber.Map{"status": "failed", "message": "Data not found", "data": nil})
 	}
 
-	return c.Status(201).JSON(fiber.Map{"status": "success", "message": "User data retrieved", "data": user})
+	return c.Status(201).
+		JSON(fiber.Map{"status": "success", "message": "User data retrieved", "data": data})
 }

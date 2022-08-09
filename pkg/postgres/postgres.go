@@ -13,11 +13,10 @@ import (
 	// "gorm.io/gorm/schema"
 )
 
-// Declare the variable for the database
-var DB *gorm.DB
-
 // ConnectDB connect to db
-func ConnectDB() {
+func ConnectDB() *gorm.DB {
+	// Declare the variable for the database
+	var db *gorm.DB
 	var err error
 	p := configs.Config().Dbconfig.Port
 	port, err := strconv.ParseUint(p, 10, 32)
@@ -28,7 +27,7 @@ func ConnectDB() {
 	// Connection URL to connect to Postgres Database
 	dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", configs.Config().Dbconfig.Host, port, configs.Config().Dbconfig.Username, configs.Config().Dbconfig.Password, configs.Config().Dbconfig.Dbname)
 	// Connect to the DB and initialize the DB variable
-	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 
 	if err != nil {
 		panic("failed to connect database")
@@ -37,10 +36,11 @@ func ConnectDB() {
 	fmt.Println("Connection Opened to Database")
 
 	// Migrate the database
-	err = DB.AutoMigrate(&model.Account{}, &model.User{}, &model.Cashflow{})
+	err = db.AutoMigrate(&model.Account{}, &model.User{}, &model.Cashflow{})
 	if err != nil {
 		panic("[Gorm] Database failed to migrate!")
 	}
 
 	fmt.Println("Database Migrated")
+	return db
 }
