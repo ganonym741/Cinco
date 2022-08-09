@@ -15,7 +15,7 @@ func AllRouter(app *fiber.App, service service.Service) {
 	// api.Post("/user/register", Handler.UserRegister)
 	// api.Post("/user/login", Handler.UserLogin)
 	// api.Post("/user/logout", Handler.UserLogout)
-	api.Get("/user/profile", Handler.UserProfile)
+	api.Get("/user/profile/:userId", Handler.UserProfile)
 
 	// api.Post("/user/activation", Handler.AccountActivation)
 

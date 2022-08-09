@@ -11,7 +11,7 @@ type Repository struct {
 	Db *gorm.DB
 }
 
-func (r Repository) GetUserDetail(ctx context.Context, user *model.User) error {
-	err := r.Db.Find(&user).Error
+func (r Repository) GetUserDetail(ctx context.Context, user *model.User, params string) error {
+	err := r.Db.First(&user, "user_id = ?", params).Error
 	return err
 }
