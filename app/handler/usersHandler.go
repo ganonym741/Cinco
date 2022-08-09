@@ -42,9 +42,26 @@ func UserRegister(c *fiber.Ctx) error {
 	})
 }
 
-//func UserLogin(c *fiber.Ctx) error {
-//
-//}
+func UserLogin(c *fiber.Ctx) error {
+	db := db.DB
+
+	paramsLogin := new(param.Login)
+
+	if err := c.BodyParser(paramsLogin); err != nil {
+		return err
+	}
+
+	dest := new(model.User)
+
+	db.Where("username = ? or email = ?", paramsLogin.Identity, paramsLogin.Identity).Find(&dest)
+
+	return c.Status(200).JSON(fiber.Map{
+		"status":  "success",
+		"message": "User data find",
+		"data":    dest,
+	})
+}
+
 // func UserLogout(c *fiber.Ctx) error {
 
 // }
@@ -52,9 +69,13 @@ func UserProfile(c *fiber.Ctx) error {
 	db := db.DB
 	var user model.User
 
-	db.Find(&user)
+	if err := c.ParamsParser(user.Id); err != nil {
+		return err
+	}
 
-	if user.UserId == "" {
+	db.Where("id = ?", user.Id).Find(&user)
+
+	if user.Id == "" {
 		return c.Status(401).JSON(fiber.Map{"status": "error", "message": "User data not found", "data": nil})
 	}
 
