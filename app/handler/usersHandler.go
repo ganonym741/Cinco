@@ -36,7 +36,6 @@ func NewHandler(s service.Service) Handler {
 func (h Handler) UserProfile(c *fiber.Ctx) error {
 	ctx := context.Background()
 	params := c.Params("userId")
-
 	data, err := h.service.GetUserDetail(ctx, params)
 	if err != nil {
 		return c.Status(201).

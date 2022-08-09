@@ -5,8 +5,8 @@ import (
 )
 
 type Account struct {
-	UserId    string `gorm:"type:uuid" json:"userid"`
-	AccountId string `gorm:"type:uuid;primary_key" json:"AccountId"`
-	Balance   int    `json:"balance"`
+	Id      string `gorm:"type:uuid;primary_key" json:"Id"`
+	UserId  string `gorm:"type:uuid" json:"userid"`
+	Balance int    `json:"balance"`
 	gorm.Model
 }
