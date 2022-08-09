@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"github.com/gofiber/fiber/v2"
 	"gitlab.com/cinco/app/model"
 	"gitlab.com/cinco/app/repository/interfaces"
 	"gorm.io/gorm"
@@ -11,7 +10,7 @@ type CashflowRepository struct {
 	Db *gorm.DB
 }
 
-func (c CashflowRepository) FindByAccount(ctx fiber.Ctx, userUUID string, startDate int, endDate int) []model.Cashflow {
+func (c CashflowRepository) FindByAccount(userUUID string, startDate int, endDate int) []model.Cashflow {
 	query := "SELECT c.type, c.ammount, c.description, c.created_at FROM Cashflow c " +
 		"INNER JOIN Account a ON c.account_uuid = a.account_uuid " +
 		"INNER JOIN User u ON a.user_uuid = u.user_uuid "
