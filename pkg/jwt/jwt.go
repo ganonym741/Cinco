@@ -20,7 +20,7 @@ func (jwtManager *JwtManager) CreateToken(user *models.User) string {
 	configs := configs.Config()
 
 	claims := jwt.MapClaims{
-		"userid": user.UserId,
+		"userid": user.Id,
 		"exp":    time.Now().Add(time.Duration(configs.Jwtconfig.Expired) * time.Second).Unix(),
 	}
 

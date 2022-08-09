@@ -51,23 +51,32 @@ func UserLogin(c *fiber.Ctx) error {
 		return err
 	}
 
-	dest := new(model.User)
+	result := new(model.User)
 
-	db.Where("username = ? or email = ?", paramsLogin.Identity, paramsLogin.Identity).Find(&dest)
+	db.Where("username = ? or email = ?", paramsLogin.Identity, paramsLogin.Identity).Find(&result)
 
-	isMatch := utilities.ComparePasswords(dest.Password)
+	isMatch := utilities.ComparePasswords(result.Password, []byte(paramsLogin.Password))
+	if !isMatch {
+		c.Status(403).JSON(fiber.Map{
+			"status":  "failed",
+			"message": "Wrong username & password",
+			"data":    nil,
+		})
+	}
+
+	token := utilities.CreateToken(result)
 
 	return c.Status(200).JSON(fiber.Map{
 		"status":  "success",
-		"message": "User data find",
-		"data":    dest,
+		"message": "User data retrieved",
+		"data":    token,
 	})
 
 }
 
-// func UserLogout(c *fiber.Ctx) error {
-
-// }
+//func UserLogout(c *fiber.Ctx) error {
+//
+//}
 func UserProfile(c *fiber.Ctx) error {
 	db := db.DB
 	var user model.User
