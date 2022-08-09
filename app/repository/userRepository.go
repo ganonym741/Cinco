@@ -12,6 +12,6 @@ type Repository struct {
 }
 
 func (r Repository) GetUserDetail(ctx context.Context, user *model.User, params string) error {
-	err := r.Db.First(&user, "user_id = ?", params).Error
+	err := r.Db.First(&user, "id = ?", params).Error
 	return err
 }
