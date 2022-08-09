@@ -6,6 +6,5 @@ import (
 )
 
 type AccountRepositoryInterface interface {
-	FindById(ctx fiber.Ctx, cashflow model.Account) error
-	Create(ctx fiber.Ctx, cashflow model.Account) error
+	Create(ctx fiber.Ctx, account model.Account) error
 }
