@@ -3,17 +3,19 @@ package routes
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
-
 	Handler "gitlab.com/cinco/app/handler"
+	utilities "gitlab.com/cinco/utils"
 )
 
 func AllRouter(app *fiber.App) {
-	api := app.Group("/api", logger.New())
 
+	api := app.Group("/api", logger.New())
 	api.Post("/user/register", Handler.UserRegister)
 	api.Post("/user/login", Handler.UserLogin)
 	// api.Post("/user/logout", Handler.UserLogout)
-	api.Get("/user/profile", Handler.UserProfile)
+	app.Use(utilities.TokenVerify())
+
+	api.Get("/user/profile", utilities.Authorization(true), Handler.UserProfile)
 
 	// api.Post("/user/activation", Handler.AccountActivation)
 
