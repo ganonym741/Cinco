@@ -40,7 +40,7 @@ func TokenVerify() fiber.Handler {
 				"message": "Unauthorized",
 				"data":    nil,
 			})
-			return err
+			return erro
 		}
 		claims, err := ExtractClaims(conf.Secret, parts[1])
 		if err != nil {
