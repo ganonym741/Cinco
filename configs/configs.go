@@ -49,7 +49,7 @@ func Config() *Configs {
 				Password: os.Getenv("DB_PASSWORD"),
 			},
 			Jwtconfig: ConfJWT{
-				Secret:  os.Getenv("JWT_Secret"),
+				Secret:  os.Getenv("JWT_SECRET"),
 				Expired: JwtExpired,
 			},
 		}

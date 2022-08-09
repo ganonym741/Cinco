@@ -1,4 +1,4 @@
-CREATE TYPE statusTr AS ENUM ('debet', 'credit');
+-- CREATE TYPE statusTr AS ENUM ('debet', 'credit');
 
 CREATE TABLE public.users (
 id varchar unique NOT null primary key,
@@ -6,12 +6,13 @@ username varchar not NULL,
 fullname varchar not NULL,
 "password" varchar not NULL,
 email varchar not NULL,
-birthdate date not NULL,
+status boolean default false,
+birth_date date not NULL,
 domicile varchar not NULL,
 occupation varchar not NULL,
 created_at timestamp default now(),
 updated_at timestamp,
-updated_by integer
+updated_by integer default 0
 );
 
 CREATE TABLE public.account (
