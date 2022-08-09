@@ -1,46 +1,74 @@
 package handler
 
 import (
-	"context"
+	"gitlab.com/cinco/app/service/interfaces"
+	"strconv"
 
 	"github.com/gofiber/fiber/v2"
-	"gitlab.com/cinco/app/model"
 )
 
 type CincoCashflow interface {
 	DoTransaction()
 	CashflowEdit()
 	CashflowDelete()
-	CashflowHistory()
+	CashflowHistory(c *fiber.Ctx) error
 }
 
-func (h Handler) DoTransaction(c *fiber.Ctx) error {
-	ctx := context.Background()
-	var body model.Cashflow
+type CashflowHandler struct {
+	cashflowService interfaces.CashflowServiceInterface
+}
 
-	err := c.BodyParser(&body)
-	if err != nil {
-		return c.Status(501).JSON(fiber.Map{"status": "Failed", "message": "Periksa kembali inputan anda", "data": nil})
+func (ch CashflowHandler) DoTransaction() {
+	/*
+		ctx := context.Background()
+			var body model.Cashflow
+
+			err := c.BodyParser(&body)
+			if err != nil {
+				return c.Status(501).JSON(fiber.Map{"status": "Failed", "message": "Periksa kembali inputan anda", "data": nil})
+			}
+
+			if body.Type == "Uang Masuk" || body.Type == "Uang Keluar" {
+				_, err := h.service.AddTransaction(ctx, &body)
+				if err != nil {
+					return c.Status(501).JSON(fiber.Map{"status": "Failed", "message": "Server sedang bermasalah, silahkan coba beberapa saat lagi", "data": nil})
+				}
+			} else {
+				return c.Status(501).JSON(fiber.Map{"status": "Failed", "message": "Tipe transasksi salah", "data": nil})
+			}
+
+			return c.Status(201).
+				JSON(fiber.Map{"status": "success", "message": "Transaksi baru telah ditambahkan", "data": cashflow})
+	*/
+	panic("implement me")
+}
+
+func (ch CashflowHandler) CashflowEdit() {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (ch CashflowHandler) CashflowDelete() {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (ch CashflowHandler) CashflowHistory(c *fiber.Ctx) error {
+	startDate, _ := strconv.ParseInt(c.Params("startdate"), 10, 64)
+	endDate, _ := strconv.ParseInt(c.Params("enddate"), 10, 64)
+	uuid := c.Params("uuid")
+
+	if len(uuid) <= 0 || startDate <= 0 || endDate <= 0 {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"status": "bad request", "message": "bad request", "data": nil})
 	}
 
-	if body.Type == "Uang Masuk" || body.Type == "Uang Keluar" {
-		_, err := h.service.AddTransaction(ctx, &body)
-		if err != nil {
-			return c.Status(501).JSON(fiber.Map{"status": "Failed", "message": "Server sedang bermasalah, silahkan coba beberapa saat lagi", "data": nil})
-		}
-	} else {
-		return c.Status(501).JSON(fiber.Map{"status": "Failed", "message": "Tipe transasksi salah", "data": nil})
+	cashflows := ch.cashflowService.FindTransactionLog(uuid, startDate, endDate)
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"status": "success", "message": "success", "data": cashflows})
+}
+
+func NewCashflowHandler(service interfaces.CashflowServiceInterface) CincoCashflow {
+	return &CashflowHandler{
+		cashflowService: service,
 	}
-
-	return c.Status(201).
-		JSON(fiber.Map{"status": "success", "message": "Transaksi baru telah ditambahkan", "data": cashflow})
-}
-func CashflowEdit(c *fiber.Ctx) {
-
-}
-func CashflowDelete(c *fiber.Ctx) {
-
-}
-func CashflowHistory(c *fiber.Ctx) {
-
 }

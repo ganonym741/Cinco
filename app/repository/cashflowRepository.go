@@ -4,24 +4,22 @@ import (
 	"gitlab.com/cinco/app/model"
 	"gitlab.com/cinco/app/repository/interfaces"
 	"gorm.io/gorm"
+	"time"
 )
 
 type CashflowRepository struct {
 	Db *gorm.DB
 }
 
-func (c CashflowRepository) FindByAccount(userUUID string, startDate int, endDate int) []model.Cashflow {
-	query := "SELECT c.type, c.ammount, c.description, c.created_at FROM Cashflow c " +
+func (c CashflowRepository) FindByAccount(userUUID string, startDate time.Time, endDate time.Time) []model.Cashflow {
+	var query = "SELECT c.type, c.ammount, c.description, c.created_at FROM Cashflow c " +
 		"INNER JOIN Account a ON c.account_uuid = a.account_uuid " +
-		"INNER JOIN User u ON a.user_uuid = u.user_uuid "
-	if len(userUUID) != 0 && userUUID != "" {
-		query += "WHERE u.user_uuid = ? " + userUUID
+		"INNER JOIN User u ON a.user_uuid = u.user_uuid " +
+		"WHERE u.user_uuid = ? " + userUUID
+	if !startDate.IsZero() && !endDate.IsZero() {
+		query += "AND c.created_at BETWEEN " + startDate.String() + " AND " + endDate.String() + ""
 	}
 
-	if startDate > 0 && endDate > 0 {
-		query += "AND c.created_at BETWEEN ++ " +
-			"AND "
-	}
 	var cashflows []model.Cashflow
 	c.Db.Raw(query).Scan(&cashflows)
 
