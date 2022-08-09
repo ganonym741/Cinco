@@ -4,10 +4,12 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 
-	Handler "gitlab.com/cinco/app/handler"
+	"gitlab.com/cinco/app/handler"
+	"gitlab.com/cinco/app/service"
 )
 
-func AllRouter(app *fiber.App) {
+func AllRouter(app *fiber.App, service service.Service) {
+	Handler := handler.NewHandler(service)
 	api := app.Group("/api", logger.New())
 
 	// api.Post("/user/register", Handler.UserRegister)
