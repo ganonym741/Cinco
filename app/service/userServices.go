@@ -22,5 +22,10 @@ func NewService() Service {
 
 func (s Service) GetUserDetail(ctx context.Context, userid string) (*model.User, error) {
 	var data *model.User
+
+	err := s.repository.GetUserDetail(ctx, data)
+	if err != nil {
+		return nil, err
+	}
 	return data, nil
 }
