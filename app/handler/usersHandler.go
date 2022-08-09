@@ -55,11 +55,14 @@ func UserLogin(c *fiber.Ctx) error {
 
 	db.Where("username = ? or email = ?", paramsLogin.Identity, paramsLogin.Identity).Find(&dest)
 
+	isMatch := utilities.ComparePasswords(dest.Password)
+
 	return c.Status(200).JSON(fiber.Map{
 		"status":  "success",
 		"message": "User data find",
 		"data":    dest,
 	})
+
 }
 
 // func UserLogout(c *fiber.Ctx) error {
@@ -69,9 +72,9 @@ func UserProfile(c *fiber.Ctx) error {
 	db := db.DB
 	var user model.User
 
-	userID := c.Params("id");
+	userID := c.Query("id")
 
-	db.Where("id = ?", userID).Find(&user)
+	db.Where("id = ?", userID).First(&user)
 
 	if user.Id == "" {
 		return c.Status(401).JSON(fiber.Map{"status": "error", "message": "User data not found", "data": nil})
