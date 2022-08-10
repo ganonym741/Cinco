@@ -35,6 +35,7 @@ func ConnectDB() *gorm.DB {
 	fmt.Println("Connection Opened to Database")
 
 	// Migrate the database
+<<<<<<< HEAD
 	//<<<<<<< HEAD
 	//	err = db.AutoMigrate(&model.Account{}, &model.User{}, &model.Cashflow{})
 	//	if err != nil {
@@ -42,6 +43,14 @@ func ConnectDB() *gorm.DB {
 	//	}
 	//
 	//	fmt.Println("Database Migrated")
+=======
+	// err = db.AutoMigrate(&model.Account{}, &model.User{}, &model.Cashflow{})
+	// if err != nil {
+	// 	panic("[Gorm] Database failed to migrate!")
+	// }
+
+	// fmt.Println("Database Migrated")
+>>>>>>> origin/feature/hansen
 	return db
 	//=======
 	//err = DB.AutoMigrate(&model.Account{}, &model.User{}, &model.Cashflow{})

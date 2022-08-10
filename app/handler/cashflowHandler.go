@@ -9,15 +9,15 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+type Handler struct {
+	cashflowService interfaces.CashflowServiceInterface
+}
+
 type CincoCashflow interface {
 	DoTransaction(ctx *fiber.Ctx) error
 	CashflowEdit(c *fiber.Ctx) error
 	CashflowDelete(c *fiber.Ctx) error
 	CashflowHistory(c *fiber.Ctx) error
-}
-
-type Handler struct {
-	cashflowService interfaces.CashflowServiceInterface
 }
 
 func (h Handler) DoTransaction(ctx *fiber.Ctx) error {
@@ -41,27 +41,51 @@ func (h Handler) DoTransaction(ctx *fiber.Ctx) error {
 		JSON(fiber.Map{"status": "success", "message": "Transaksi baru telah ditambahkan", "data": body})
 }
 
-func (h Handler) CashflowEdit(c *fiber.Ctx) error {
-	return nil
-}
-
-func (h Handler) CashflowDelete(c *fiber.Ctx) error {
-	return nil
-}
-
-func (h Handler) CashflowHistory(c *fiber.Ctx) error {
-	startDate, _ := strconv.ParseInt(c.Query("startdate"), 10, 64)
-	endDate, _ := strconv.ParseInt(c.Query("enddate"), 10, 64)
-	uuid := c.Query("uuid")
-	tipe := c.Query("type")
+func (h Handler) CashflowHistory(ctx *fiber.Ctx) error {
+	startDate, _ := strconv.ParseInt(ctx.Query("startdate"), 10, 64)
+	endDate, _ := strconv.ParseInt(ctx.Query("enddate"), 10, 64)
+	uuid := ctx.Query("uuid")
+	tipe := ctx.Query("type")
 
 	if len(uuid) <= 0 || startDate <= 0 || endDate <= 0 {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"status": fiber.StatusBadRequest, "message": "bad request", "data": nil})
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"status": fiber.StatusBadRequest, "message": "bad request", "data": nil})
 	}
 
 	cashflows := h.cashflowService.FindTransactionLog(uuid, tipe, startDate, endDate)
 
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{"status": fiber.StatusOK, "message": "success", "data": cashflows})
+	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{"status": fiber.StatusOK, "message": "success", "data": cashflows})
+}
+
+func (h Handler) CashflowEdit(ctx *fiber.Ctx) error {
+	params := ctx.Params("cashflowId")
+	paramsIdAccount := ctx.Params("accountId")
+
+	var modelcashflow model.Cashflow
+	ctx.BodyParser(&modelcashflow)
+
+	//
+	var modelaccount model.Account
+	ctx.BodyParser(&modelaccount)
+
+	data, err := h.cashflowService.EditCashflow(ctx, &modelcashflow, &modelaccount, params, paramsIdAccount)
+	if err != nil {
+		return ctx.Status(200).
+			JSON(fiber.Map{"status": "failed", "message": "Data not found", "data": nil})
+	}
+	return ctx.Status(201).
+		JSON(fiber.Map{"status": "success", "message": "User data retrieved", "data": data})
+}
+
+func (h Handler) CashflowDelete(ctx *fiber.Ctx) error {
+	params := ctx.Params("cashflowId")
+
+	data, err := h.cashflowService.DeleteCashflow(ctx, params)
+	if err != nil {
+		return ctx.Status(200).
+			JSON(fiber.Map{"status": "failed", "message": "Data not found", "data": nil})
+	}
+	return ctx.Status(201).
+		JSON(fiber.Map{"status": "success", "message": "User data retrieved", "data": data})
 }
 
 func NewCashflowHandler(service interfaces.CashflowServiceInterface) CincoCashflow {

@@ -38,4 +38,6 @@ func AllRouter(app *fiber.App, db *gorm.DB) {
 
 	api.Post("/user/activation/:userId", utilities.Authorization(true), accountHandler.AccountActivation)
 	api.Get("/cash", utilities.Authorization(true), cashflowHandler.CashflowHistory)
+	api.Put("/user/:cashflowId/:accountId", cashflowHandler.CashflowEdit)
+	api.Delete("/user/:cashflowId", cashflowHandler.CashflowDelete)
 }
