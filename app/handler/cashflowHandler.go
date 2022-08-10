@@ -32,12 +32,15 @@ func (h Handler) DoTransaction(ctx *fiber.Ctx) error {
 	return ctx.Status(201).
 		JSON(fiber.Map{"status": "success", "message": "Transaksi baru telah ditambahkan", "data": body})
 }
-func CashflowEdit(c *fiber.Ctx) {
 
+func (h Handler) CashflowEdit(c *fiber.Ctx) error {
+	return nil
 }
-func CashflowDelete(c *fiber.Ctx) {
 
+func (h Handler) CashflowDelete(c *fiber.Ctx) error {
+	return nil
 }
-func CashflowHistory(c *fiber.Ctx) {
 
+func (h Handler) CashflowHistory(c *fiber.Ctx) error {
+	return nil
 }

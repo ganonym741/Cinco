@@ -6,6 +6,6 @@ type CincoAccount interface {
 	AccountActivation()
 }
 
-func AccountActivation(c *fiber.Ctx) {
-
+func (h Handler) AccountActivation(c *fiber.Ctx) error {
+	return nil
 }
