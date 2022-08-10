@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"fmt"
 	"gitlab.com/cinco/app/model"
 	"gitlab.com/cinco/app/repository/interfaces"
 	"gorm.io/gorm"
@@ -15,11 +14,12 @@ type CashflowRepository struct {
 func (c CashflowRepository) FindByAccount(userUUID string, tipe string, startDate time.Time, endDate time.Time) []model.Cashflow {
 	format := "2006-01-02 15:04:05"
 
-	var query = "SELECT c.type, c.amount, c.balance_history, c.description, c.created_at " +
+	var query = "SELECT c.id, c.type, c.amount, c.balance_history, c.description " +
 		"FROM cashflows c " +
 		"INNER JOIN accounts a ON c.account_id  = a.id " +
 		"INNER JOIN users u ON a.user_id = u.id " +
 		"WHERE u.id = '" + userUUID + "' "
+
 	if len(tipe) > 0 && tipe != "" {
 		query += " AND c.type = '" + tipe + "' "
 	}
@@ -28,12 +28,8 @@ func (c CashflowRepository) FindByAccount(userUUID string, tipe string, startDat
 		query += " AND c.created_at BETWEEN '" + Bod(startDate).Format(format) + "' AND '" + Eod(endDate).Format(format) + "'"
 	}
 
-	fmt.Println(query)
-
 	var cashflows []model.Cashflow
 	c.Db.Raw(query).Scan(&cashflows)
-
-	fmt.Println(len(cashflows))
 
 	return cashflows
 }

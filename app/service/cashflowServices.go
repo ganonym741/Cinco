@@ -13,10 +13,6 @@ type CashflowService struct {
 }
 
 func (c CashflowService) FindTransactionLog(userUUID string, tipe string, startDate int64, endDate int64) []model.Cashflow {
-	if len(userUUID) == 0 || userUUID == "" {
-		return nil
-	}
-
 	return c.cashflowRepository.FindByAccount(userUUID, tipe, time.Unix(startDate, 0), time.Unix(endDate, 0))
 }
 

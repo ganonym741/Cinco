@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"gitlab.com/cinco/app/service/interfaces"
 )
@@ -15,7 +16,8 @@ type AccountHandler struct {
 }
 
 func (a AccountHandler) AccountActivation(c *fiber.Ctx) error {
-	userUUID := c.Query("*")
+	fmt.Printf("TEST %s ", c.Params("userId"))
+	userUUID := c.Params("userId")
 
 	if userUUID != "" {
 		user := a.UserService.FindByID(userUUID)

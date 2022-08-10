@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"gitlab.com/cinco/app/service/interfaces"
 	"strconv"
 
@@ -60,9 +59,7 @@ func (ch CashflowHandler) CashflowHistory(c *fiber.Ctx) error {
 	uuid := c.Query("uuid")
 	tipe := c.Query("type")
 
-	fmt.Printf("param : %s \n", c.Query("startdate"))
-
-	if len(uuid) <= 0 || startDate <= 0 || endDate <= 0 || len(tipe) <= 0 {
+	if len(uuid) <= 0 || startDate <= 0 || endDate <= 0 {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"status": fiber.StatusBadRequest, "message": "bad request", "data": nil})
 	}
 

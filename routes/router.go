@@ -31,7 +31,7 @@ func AllRouter(app *fiber.App, db *gorm.DB) {
 	// api.Post("/user/logout", Handler.UserLogout)
 	//api.Get("/user/profile/:userId", Handler.UserProfile)
 
-	api.Post("/user/activation", accountHandler.AccountActivation)
+	api.Post("/user/activation/:userId", accountHandler.AccountActivation)
 
 	//api.Post("/cash", Handler.DoTransaction)
 	//api.Put("/user/:cashflowId", Handler.CashflowEdit)

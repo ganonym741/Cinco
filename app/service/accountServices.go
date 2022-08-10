@@ -1,6 +1,7 @@
 package service
 
 import (
+	"github.com/google/uuid"
 	"gitlab.com/cinco/app/model"
 	repoInterfaces "gitlab.com/cinco/app/repository/interfaces"
 	"gitlab.com/cinco/app/service/interfaces"
@@ -12,6 +13,7 @@ type AccountService struct {
 
 func (a AccountService) CreateAccount(userUUID string) error {
 	account := model.Account{
+		Id:      uuid.New().String(),
 		Balance: 0,
 		UserId:  userUUID,
 	}
