@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"gitlab.com/cinco/app/param"
 	"gitlab.com/cinco/app/service"
@@ -70,7 +69,6 @@ func (h Handler) UserLogin(ctx *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println("jalan")
 
 	data, err := h.service.UserLogin(ctx, &paramsLogin)
 	if err != nil {

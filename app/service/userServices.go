@@ -1,6 +1,7 @@
 package service
 
 import (
+	"errors"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"gitlab.com/cinco/configs"
@@ -69,21 +70,13 @@ func (s Service) UserLogin(ctx *fiber.Ctx, params *param.Login) (*response.Login
 		return nil, err
 	}
 
-	if result.Status != true {
-		return nil, ctx.Status(403).JSON(fiber.Map{
-			"status":  "failed",
-			"message": "Account not activate",
-			"data":    nil,
-		})
-	}
-
 	isMatch := utilities.ComparePasswords(result.Password, []byte(params.Password))
 	if !isMatch {
-		return nil, ctx.Status(403).JSON(fiber.Map{
-			"status":  "failed",
-			"message": "Wrong username & password",
-			"data":    nil,
-		})
+		return nil, errors.New("wrong email or password ")
+	}
+
+	if result.Status != true {
+		return nil, errors.New("your account is deactive")
 	}
 
 	token := utilities.CreateToken(result)
@@ -93,7 +86,6 @@ func (s Service) UserLogin(ctx *fiber.Ctx, params *param.Login) (*response.Login
 		Messages: "User data retrieved",
 		Token:    token,
 	}, nil
-
 }
 
 func (s Service) UserLogout(ctx *fiber.Ctx, params string) (*response.LogoutResponse, error) {
