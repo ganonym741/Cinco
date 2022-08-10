@@ -1,5 +1,0 @@
-package utilities
-
-func SendMailActivation() {
-
-}

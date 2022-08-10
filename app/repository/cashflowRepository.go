@@ -29,11 +29,11 @@ func (c CashflowRepository) FindByAccount(ctx fiber.Ctx, userUUID string, startD
 	return cashflows
 }
 
+func (r Repository) PostTransaction(ctx *fiber.Ctx, body *model.Cashflow) error {
+	err := r.Db.Create(&body).Error
+	return err
+}
+
 func NewCashflowRepository() interfaces.CashflowRepositoryInterface {
 	return &CashflowRepository{}
 }
-
-/*func (r Repository) PostTransaction(ctx fiber.Ctx, cashflow model.Cashflow) error {
-	err := r.Db.Create(&cashflow).Error
-	return err
-}*/

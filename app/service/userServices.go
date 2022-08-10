@@ -2,12 +2,13 @@ package service
 
 import (
 	"errors"
+	"strings"
+	"time"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"gitlab.com/cinco/configs"
 	utilities "gitlab.com/cinco/utils"
-	"strings"
-	"time"
 
 	"gitlab.com/cinco/app/model"
 	"gitlab.com/cinco/app/param"
@@ -63,6 +64,7 @@ func (s Service) GetUserDetail(ctx *fiber.Ctx, userid string) (*model.User, erro
 	if err != nil {
 		return nil, err
 	}
+
 	return &data, nil
 }
 

@@ -4,8 +4,8 @@ go 1.18
 
 require (
 	github.com/gofiber/fiber/v2 v2.36.0
-	github.com/gofiber/jwt/v3 v3.2.14
 	golang.org/x/crypto v0.0.0-20220214200702-86341886e292
+	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 	gorm.io/driver/postgres v1.3.8
 )
 
@@ -22,7 +22,6 @@ require (
 	github.com/jinzhu/now v1.1.4 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
-	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df // indirect
 )
 
 require (
