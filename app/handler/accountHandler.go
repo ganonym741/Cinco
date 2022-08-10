@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"gitlab.com/cinco/app/service/interfaces"
+	utilities "gitlab.com/cinco/utils"
 )
 
 type CincoAccount interface {
@@ -25,9 +26,14 @@ func (a AccountHandler) AccountActivation(c *fiber.Ctx) error {
 		if len(user.Id) == 0 || user.Id == "" {
 			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"status": fiber.StatusNotFound, "message": "User not found"})
 		} else {
+			if user.Status == true {
+				utilities.SendMail(user.Email, "your account is already activated, please contact system administrator.")
+				return c.Status(fiber.StatusOK).JSON(fiber.Map{"status": fiber.StatusConflict, "message": "user already activated"})
+			}
 			err := a.AccountService.CreateAccount(userUUID)
 
 			if err != nil {
+				utilities.SendMail(user.Email, "error in creating account, please contact system administrator.")
 				return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"status": fiber.StatusInternalServerError, "message": err.Error()})
 			}
 
@@ -36,8 +42,12 @@ func (a AccountHandler) AccountActivation(c *fiber.Ctx) error {
 			err = a.UserService.Update(user)
 
 			if err != nil {
+				utilities.SendMail(user.Email, "failed to activate your account, please contact system administrator.")
+
 				return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"status": fiber.StatusInternalServerError, "message": err.Error()})
 			}
+
+			utilities.SendMail(user.Email, "your account has been activated successfully.")
 
 			return c.Status(fiber.StatusOK).JSON(fiber.Map{"status": "success", "message": "User data has been activated successfully."})
 		}
