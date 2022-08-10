@@ -69,9 +69,17 @@ func (s Service) UserLogin(ctx *fiber.Ctx, params *param.Login) (*response.Login
 		return nil, err
 	}
 
+	if result.Status != true {
+		return nil, ctx.Status(403).JSON(fiber.Map{
+			"status":  "failed",
+			"message": "Account not activate",
+			"data":    nil,
+		})
+	}
+
 	isMatch := utilities.ComparePasswords(result.Password, []byte(params.Password))
 	if !isMatch {
-		ctx.Status(403).JSON(fiber.Map{
+		return nil, ctx.Status(403).JSON(fiber.Map{
 			"status":  "failed",
 			"message": "Wrong username & password",
 			"data":    nil,

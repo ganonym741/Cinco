@@ -25,12 +25,12 @@ func ExtractClaims(secret, tokenStr string) (jwt.MapClaims, error) {
 }
 
 func TokenVerify() fiber.Handler {
-	return func(c *fiber.Ctx) error {
+	return func(ctx *fiber.Ctx) error {
 		configs := configs.Config()
-		token := c.GetReqHeaders()["Authorization"]
+		token := ctx.GetReqHeaders()["Authorization"]
 		parts := strings.Split(token, " ")
 		if token == "" {
-			return c.Status(401).JSON(fiber.Map{
+			return ctx.Status(401).JSON(fiber.Map{
 				"status":  "failed",
 				"message": "Unauthorized",
 				"data":    nil,
@@ -38,7 +38,7 @@ func TokenVerify() fiber.Handler {
 		}
 		claims, err := ExtractClaims(configs.Jwtconfig.Secret, parts[1])
 		if err != nil {
-			return c.Status(401).JSON(fiber.Map{
+			return ctx.Status(401).JSON(fiber.Map{
 				"status":  "failed",
 				"message": "Unauthorized",
 				"data":    nil,
@@ -49,27 +49,27 @@ func TokenVerify() fiber.Handler {
 		json.Unmarshal(encoded, &result)
 		for key, val := range result {
 			valStr := fmt.Sprintf(`%v`, val)
-			c.Set(key, valStr)
+			ctx.Set(key, valStr)
 			//fmt.Println(key, valStr)
 		}
 		//fmt.Println("ini c get di atas =", c.GetReqHeaders())
-		return c.Next()
+		return ctx.Next()
 	}
 }
 
 func Authorization(status bool) fiber.Handler {
-	return func(c *fiber.Ctx) error {
+	return func(ctx *fiber.Ctx) error {
 		configs := configs.Config()
-		token := strings.Split(c.Get("Authorization"), " ")
+		token := strings.Split(ctx.Get("Authorization"), " ")
 		claim, _ := ExtractClaims(configs.Jwtconfig.Secret, token[1])
 		if claim["status"] != status {
-			return c.Status(403).JSON(fiber.Map{
+			return ctx.Status(403).JSON(fiber.Map{
 				"status":  "failed",
 				"message": "Account not activate",
 				"data":    nil,
 			})
 		}
-		c.Next()
+		ctx.Next()
 		return nil
 	}
 }
