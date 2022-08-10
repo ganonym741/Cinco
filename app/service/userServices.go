@@ -50,7 +50,10 @@ func (s Service) UserRegister(ctx *fiber.Ctx, params *param.User) (*response.Reg
 		return nil, err
 	}
 
-	err = utilities.SendMail(params.Email, "")
+	err = utilities.SendMail(params.Email, params.Id)
+	if err != nil {
+		return nil, err
+	}
 
 	return &response.RegisterResponse{
 		Messages: "Register Success Check Your Email to Activated",
@@ -79,7 +82,7 @@ func (s Service) UserLogin(ctx *fiber.Ctx, params *param.Login) (*response.Login
 		return nil, errors.New("wrong email or password ")
 	}
 
-	if result.Status != true {
+	if !result.Status {
 		return nil, errors.New("your account is deactive")
 	}
 

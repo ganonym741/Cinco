@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"fmt"
+
 	"github.com/gofiber/fiber/v2"
 	"gitlab.com/cinco/app/param"
 	"gitlab.com/cinco/app/service"
@@ -18,8 +20,9 @@ func NewHandler(s service.Service) Handler {
 
 func (h Handler) UserRegister(ctx *fiber.Ctx) error {
 	var params *param.User
-	err := ctx.BodyParser(params)
+	err := ctx.BodyParser(&params)
 	if err != nil {
+		fmt.Println("error1")
 		return ctx.Status(400).
 			JSON(fiber.Map{
 				"status": "failed",
@@ -29,6 +32,7 @@ func (h Handler) UserRegister(ctx *fiber.Ctx) error {
 
 	data, err := h.service.UserRegister(ctx, params)
 	if err != nil {
+		fmt.Println("error2")
 		return ctx.Status(400).
 			JSON(fiber.Map{
 				"status": "failed",

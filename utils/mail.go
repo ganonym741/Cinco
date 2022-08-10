@@ -1,17 +1,18 @@
 package utilities
 
 import (
-	"gopkg.in/gomail.v2"
 	"os"
 	"strconv"
+
+	"gopkg.in/gomail.v2"
 )
 
-func SendMail(to string, body string) error {
+func SendMail(to string, userId string) error {
 	mailer := gomail.NewMessage()
 	mailer.SetHeader("From", os.Getenv("MAIL_SENDER_NAME"))
 	mailer.SetHeader("To", to)
 	mailer.SetHeader("Subject", "Account Activation")
-	mailer.SetBody("text/html", body)
+	mailer.SetBody("text/html", "https://localhost:8000/api/user/activation/"+userId)
 
 	port, _ := strconv.Atoi(os.Getenv("MAIL_SMTP_PORT"))
 

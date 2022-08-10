@@ -5,21 +5,13 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"gitlab.com/cinco/app/handler"
 	"gitlab.com/cinco/app/service"
-
-	//<<<<<<< HEAD
-
-	//)
-
-	//	api := app.Group("/api", logger.New())
-	//=======
-	//Handler "gitlab.com/cinco/app/handler"
 	utilities "gitlab.com/cinco/utils"
 )
 
 func AllRouter(app *fiber.App, service service.Service) {
-
 	Handler := handler.NewHandler(service)
 	api := app.Group("/api", logger.New())
+
 	api.Post("/user/register", Handler.UserRegister)
 	api.Post("/user/login", Handler.UserLogin)
 
@@ -27,5 +19,5 @@ func AllRouter(app *fiber.App, service service.Service) {
 
 	api.Get("/user/profile", utilities.Authorization(true), Handler.UserProfile)
 	api.Post("/user/logout", utilities.Authorization(true), Handler.UserLogout)
-
+	api.Post("/cash", utilities.Authorization(true), Handler.DoTransaction)
 }
