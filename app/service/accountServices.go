@@ -10,19 +10,13 @@ type AccountService struct {
 	accountRepository repoInterfaces.AccountRepositoryInterface
 }
 
-func (a AccountService) UserActivation(userUUID string) error {
+func (a AccountService) CreateAccount(userUUID string) error {
 	account := model.Account{
 		Balance: 0,
 		UserId:  userUUID,
 	}
 
-	err := a.accountRepository.Create(account)
-
-	if err == nil {
-
-	}
-
-	return err
+	return a.accountRepository.Create(account)
 }
 
 func NewAccountService(accoutRepository repoInterfaces.AccountRepositoryInterface) interfaces.AccountServiceInterface {

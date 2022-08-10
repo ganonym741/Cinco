@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"gitlab.com/cinco/app/service"
 	"gitlab.com/cinco/pkg/postgres"
 	"gitlab.com/cinco/routes"
 )
@@ -10,10 +9,8 @@ import (
 func main() {
 	app := fiber.New()
 
-	postgres.ConnectDB()
+	db := postgres.ConnectDB()
 
-	appService := service.NewService()
-
-	routes.AllRouter(app, appService)
+	routes.AllRouter(app, db)
 	app.Listen(":8000")
 }

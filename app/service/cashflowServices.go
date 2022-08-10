@@ -12,12 +12,12 @@ type CashflowService struct {
 	account            interfaces.AccountRepositoryInterface
 }
 
-func (c CashflowService) FindTransactionLog(userUUID string, startDate int64, endDate int64) []model.Cashflow {
+func (c CashflowService) FindTransactionLog(userUUID string, tipe string, startDate int64, endDate int64) []model.Cashflow {
 	if len(userUUID) == 0 || userUUID == "" {
 		return nil
 	}
 
-	return c.cashflowRepository.FindByAccount(userUUID, time.Unix(startDate, 0), time.Unix(endDate, 0))
+	return c.cashflowRepository.FindByAccount(userUUID, tipe, time.Unix(startDate, 0), time.Unix(endDate, 0))
 }
 
 /*func (s Service) AddTransaction(ctx context.Context, userid string) (*model.User, error) {

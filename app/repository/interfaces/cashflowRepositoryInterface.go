@@ -7,5 +7,5 @@ import (
 
 type CashflowRepositoryInterface interface {
 	//PostTransaction(ctx fiber.Ctx, cashflow model.Cashflow) (model.Cashflow, error)
-	FindByAccount(userUUID string, startDate time.Time, endDate time.Time) []model.Cashflow
+	FindByAccount(userUUID string, tipe string, startDate time.Time, endDate time.Time) []model.Cashflow
 }

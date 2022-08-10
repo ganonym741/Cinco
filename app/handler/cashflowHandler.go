@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"gitlab.com/cinco/app/service/interfaces"
 	"strconv"
 
@@ -54,17 +55,20 @@ func (ch CashflowHandler) CashflowDelete() {
 }
 
 func (ch CashflowHandler) CashflowHistory(c *fiber.Ctx) error {
-	startDate, _ := strconv.ParseInt(c.Params("startdate"), 10, 64)
-	endDate, _ := strconv.ParseInt(c.Params("enddate"), 10, 64)
-	uuid := c.Params("uuid")
+	startDate, _ := strconv.ParseInt(c.Query("startdate"), 10, 64)
+	endDate, _ := strconv.ParseInt(c.Query("enddate"), 10, 64)
+	uuid := c.Query("uuid")
+	tipe := c.Query("type")
 
-	if len(uuid) <= 0 || startDate <= 0 || endDate <= 0 {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"status": "bad request", "message": "bad request", "data": nil})
+	fmt.Printf("param : %s \n", c.Query("startdate"))
+
+	if len(uuid) <= 0 || startDate <= 0 || endDate <= 0 || len(tipe) <= 0 {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"status": fiber.StatusBadRequest, "message": "bad request", "data": nil})
 	}
 
-	cashflows := ch.cashflowService.FindTransactionLog(uuid, startDate, endDate)
+	cashflows := ch.cashflowService.FindTransactionLog(uuid, tipe, startDate, endDate)
 
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{"status": "success", "message": "success", "data": cashflows})
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"status": fiber.StatusOK, "message": "success", "data": cashflows})
 }
 
 func NewCashflowHandler(service interfaces.CashflowServiceInterface) CincoCashflow {

@@ -15,6 +15,8 @@ func (a AccoutRepository) Create(account model.Account) error {
 	return err
 }
 
-func NewAccountRepository() interfaces.AccountRepositoryInterface {
-	return &AccoutRepository{}
+func NewAccountRepository(db *gorm.DB) interfaces.AccountRepositoryInterface {
+	return &AccoutRepository{
+		Db: db,
+	}
 }

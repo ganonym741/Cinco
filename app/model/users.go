@@ -15,5 +15,6 @@ type User struct {
 	BirthDate  time.Time `json:"birthdate"`
 	Domicile   string    `json:"domicile"`
 	Occupation string    `json:"occupation"`
+	Status     bool      `json:"status"`
 	gorm.Model
 }

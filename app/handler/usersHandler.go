@@ -1,39 +1,41 @@
 package handler
 
 import (
-	"context"
-
-	"github.com/gofiber/fiber/v2"
-	"gitlab.com/cinco/app/service"
+	"gitlab.com/cinco/app/service/interfaces"
 )
 
-type Handler struct {
-	service service.Service
+type CincoUser interface {
+	UserRegister()
+	UserLogin()
+	UserLogout()
+	UserProfile()
 }
 
-func NewHandler(s service.Service) Handler {
-	return Handler{
-		service: s,
-	}
+type UserHandler struct {
+	UserService interfaces.UserServiceInterface
 }
 
-// type CincoUser interface {
-// 	UserRegister()
-// 	UserLogin()
-// 	UserLogout()
-// 	UserProfile()
-// }
+func (u UserHandler) UserRegister() {
+	//TODO implement me
+	panic("implement me")
+}
 
-// func UserRegister(c *fiber.Ctx) error {
+func (u UserHandler) UserLogin() {
+	//TODO implement me
+	panic("implement me")
+}
 
-// }
-// func UserLogin(c *fiber.Ctx) error {
+func (u UserHandler) UserLogout() {
+	//TODO implement me
+	panic("implement me")
+}
 
-// }
-// func UserLogout(c *fiber.Ctx) error {
+func (u UserHandler) UserProfile() {
+	//TODO implement me
+	panic("implement me")
+}
 
-// }
-func (h Handler) UserProfile(c *fiber.Ctx) error {
+/*func (h Handler) UserProfile(c *fiber.Ctx) error {
 	ctx := context.Background()
 	params := c.Params("userId")
 	data, err := h.service.GetUserDetail(ctx, params)
@@ -44,4 +46,10 @@ func (h Handler) UserProfile(c *fiber.Ctx) error {
 
 	return c.Status(201).
 		JSON(fiber.Map{"status": "success", "message": "User data retrieved", "data": data})
+}*/
+
+func NewUserHandler(service interfaces.UserServiceInterface) CincoUser {
+	return &UserHandler{
+		UserService: service,
+	}
 }
