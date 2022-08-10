@@ -49,8 +49,10 @@ func (s Service) UserRegister(ctx *fiber.Ctx, params *param.User) (*response.Reg
 		return nil, err
 	}
 
+	err = utilities.SendMail(params.Email, "")
+
 	return &response.RegisterResponse{
-		Messages: "Register Success",
+		Messages: "Register Success Check Your Email to Activated",
 		Data:     createdRegister,
 	}, nil
 }
