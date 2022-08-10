@@ -18,36 +18,36 @@ func (s Service) DeleteCashflow(ctx context.Context, cashflowid string) (*model.
 
 }
 
-func (s Service) EditCashflow(ctx context.Context, body *model.Cashflow, reqUpdate *model.Account, params string) (*model.Cashflow, error) {
+func (s Service) EditCashflow(ctx context.Context, body *model.Cashflow, reqUpdate *model.Account, params, paramsIdAccount string) (*model.Cashflow, error) {
 
 	data := model.Cashflow{
 		Description: body.Description,
 		Amount:      body.Amount,
 	}
 
-	amountnhistory, amounttypes, err := s.repository.GetHistoryandAmountBefore(ctx, params)
-	if err != nil {
-		return nil, err
-	}
-	fmt.Println("ini amount history", amountnhistory)
+	fmt.Println("ini data input", data.Amount)
 
-	err = s.repository.RepoEditCashFlow(ctx, &data, params)
+	amountnhistory, amounttypes, balancehistory, err := s.repository.GetHistoryandAmountBefore(ctx, params)
 	if err != nil {
 		return nil, err
 	}
 
-	balance, err := s.repository.GetBalance(ctx, params)
+	fmt.Println("S ini amount history", amountnhistory)
+
+	balance, err := s.repository.GetBalance(ctx, paramsIdAccount)
 	if err != nil {
 		return nil, err
 	}
 
+	fmt.Println("S ini balance dari repo getbalance", balance)
 
 	accountUpdate := model.Account{}
-	totalAmount := 0
 
-	fmt.Println("ini type", amountnhistory)
+	fmt.Println("S ini isi balance dari variable accountupdate ", accountUpdate.Balance)
+
+	fmt.Println("S ini type", amountnhistory)
 	switch amounttypes {
-	case "kredit":
+	case "credit":
 		if balance > data.Amount {
 			if data.Amount > amountnhistory {
 				balance = balance - (data.Amount - amountnhistory)
@@ -55,7 +55,7 @@ func (s Service) EditCashflow(ctx context.Context, body *model.Cashflow, reqUpda
 				balance = balance + (amountnhistory - data.Amount)
 			}
 		} else {
-			fmt.Println("saldo tidak mencukupi")
+			fmt.Println("S saldo tidak mencukupi")
 		}
 	case "debet":
 		if data.Amount > amountnhistory {
@@ -65,18 +65,19 @@ func (s Service) EditCashflow(ctx context.Context, body *model.Cashflow, reqUpda
 		}
 	}
 
-	fmt.Println("ini total amount", totalAmount)
+	fmt.Println("S ini total amount")
 	data.BalanceHistory = balance
 	accountUpdate.Balance = balance
-	err = s.repository.RepoUpdateBalance(ctx, &accountUpdate, params)
+	balancehistory = balance
+	err = s.repository.RepoUpdateBalance(ctx, &accountUpdate, paramsIdAccount)
+	if err != nil {
+		return nil, err
+	}
+	err = s.repository.RepoEditCashFlow(ctx, &data, params, balancehistory)
+	if err != nil {
+		return nil, err
+	}
 
-	if err != nil {
-		return nil, err
-	}
-	err = s.repository.RepoEditCashFlow(ctx, &data, params)
-	if err != nil {
-		return nil, err
-	}
 	fmt.Println(balance)
 
 	return &data, nil

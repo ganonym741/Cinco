@@ -38,6 +38,7 @@ type CincoCashflow interface {
 func (h Handler) CashflowEdit(c *fiber.Ctx) error {
 	ctx := context.Background()
 	params := c.Params("cashflowId")
+	paramsIdAccount := c.Params("accountId")
 
 	var modelcashflow model.Cashflow
 	c.BodyParser(&modelcashflow)
@@ -46,7 +47,7 @@ func (h Handler) CashflowEdit(c *fiber.Ctx) error {
 	var modelaccount model.Account
 	c.BodyParser(&modelaccount)
 
-	data, err := h.service.EditCashflow(ctx, &modelcashflow,&modelaccount, params)
+	data, err := h.service.EditCashflow(ctx, &modelcashflow,&modelaccount, params, paramsIdAccount)
 	if err != nil {
 		return c.Status(200).
 			JSON(fiber.Map{"status": "failed", "message": "Data not found", "data": nil})
