@@ -1,7 +1,10 @@
 package handler
 
 import (
+	"context"
+
 	"github.com/gofiber/fiber/v2"
+	"gitlab.com/cinco/app/model"
 )
 
 type CincoCashflow interface {
@@ -32,12 +35,37 @@ type CincoCashflow interface {
 
 // 	return c.Status(201).JSON(fiber.Map{"status": "success", "message": "Transaksi baru telah ditambahkan", "data": cashflow})
 // }
-func CashflowEdit(c *fiber.Ctx) {
+func (h Handler) CashflowEdit(c *fiber.Ctx) error {
+	ctx := context.Background()
+	params := c.Params("cashflowId")
 
-}
-func CashflowDelete(c *fiber.Ctx) {
+	var modelcashflow model.Cashflow
+	c.BodyParser(&modelcashflow)
 
-}
-func CashflowHistory(c *fiber.Ctx) {
+	//
+	var modelaccount model.Account
+	c.BodyParser(&modelaccount)
 
+	data, err := h.service.EditCashflow(ctx, &modelcashflow,&modelaccount, params)
+	if err != nil {
+		return c.Status(200).
+			JSON(fiber.Map{"status": "failed", "message": "Data not found", "data": nil})
+	}
+	return c.Status(201).
+		JSON(fiber.Map{"status": "success", "message": "User data retrieved", "data": data})
 }
+
+func (h Handler) CashflowDelete(c *fiber.Ctx) error {
+	ctx := context.Background()
+	params := c.Params("cashflowId")
+
+	data, err := h.service.DeleteCashflow(ctx, params)
+	if err != nil {
+		return c.Status(200).
+			JSON(fiber.Map{"status": "failed", "message": "Data not found", "data": nil})
+	}
+	return c.Status(201).
+		JSON(fiber.Map{"status": "success", "message": "User data retrieved", "data": data})
+}
+
+

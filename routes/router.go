@@ -20,7 +20,7 @@ func AllRouter(app *fiber.App, service service.Service) {
 	// api.Post("/user/activation", Handler.AccountActivation)
 
 	// api.Post("/cash", Handler.DoTransaction)
-	// api.Put("/user/:cashflowId", Handler.CashflowEdit)
-	// api.Delete("/user/:cashflowId", Handler.CashflowDelete)
+	api.Put("/user/:cashflowId", Handler.CashflowEdit)
+	api.Delete("/user/:cashflowId", Handler.CashflowDelete)
 	// api.Get("/cash", Handler.CashflowHistory)
 }

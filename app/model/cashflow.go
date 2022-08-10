@@ -8,7 +8,7 @@ import (
 
 type Cashflow struct {
 	UserId         string    `gorm:"type:uuid" json:"userid"`
-	CashflowId     string    `gorm:"type:uuid;primary_key" json:"cashflowid"`
+	Id             string    `gorm:"type:uuid;primary_key" json:"id"`
 	Type           string    `json:"type"`
 	Description    string    `json:"description"`
 	Amount         int       `json:"amount"`
