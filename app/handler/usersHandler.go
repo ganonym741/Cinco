@@ -85,7 +85,9 @@ func (h Handler) UserLogin(ctx *fiber.Ctx) error {
 }
 
 func (h Handler) UserLogout(ctx *fiber.Ctx) error {
-	res, err := h.service.UserLogout(ctx)
+	params := ctx.Query("id")
+
+	res, err := h.service.UserLogout(ctx, params)
 	if err != nil {
 		return err
 	}

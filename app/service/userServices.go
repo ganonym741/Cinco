@@ -88,12 +88,17 @@ func (s Service) UserLogin(ctx *fiber.Ctx, params *param.Login) (*response.Login
 
 }
 
-func (s Service) UserLogout(ctx *fiber.Ctx) (*response.LogoutResponse, error) {
+func (s Service) UserLogout(ctx *fiber.Ctx, params string) (*response.LogoutResponse, error) {
 	configs := configs.Config()
 	token := strings.Split(ctx.Get("Authorization"), " ")
 	claim, _ := utilities.ExtractClaims(configs.Jwtconfig.Secret, token[1])
-	claim["exp"] = time.Now().Add(-time.Hour)
 
+	if claim["userid"] != params {
+		var err error
+		return nil, err
+	}
+
+	claim["exp"] = time.Now().Add(-time.Hour)
 	return &response.LogoutResponse{
 		Status:   "success",
 		Messages: "logout",
