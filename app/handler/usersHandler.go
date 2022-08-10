@@ -5,20 +5,21 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"gitlab.com/cinco/app/param"
-	"gitlab.com/cinco/app/service"
+	"gitlab.com/cinco/app/service/interfaces"
 )
 
-type Handler struct {
-	service service.Service
+type CincoUser interface {
+	UserRegister(ctx *fiber.Ctx) error
+	UserLogin(ctx *fiber.Ctx) error
+	UserLogout(ctx *fiber.Ctx) error
+	UserProfile(ctx *fiber.Ctx) error
 }
 
-func NewHandler(s service.Service) Handler {
-	return Handler{
-		service: s,
-	}
+type UserHandler struct {
+	UserService interfaces.UserServiceInterface
 }
 
-func (h Handler) UserRegister(ctx *fiber.Ctx) error {
+func (h UserHandler) UserRegister(ctx *fiber.Ctx) error {
 	var params *param.User
 	err := ctx.BodyParser(&params)
 	if err != nil {
@@ -30,7 +31,7 @@ func (h Handler) UserRegister(ctx *fiber.Ctx) error {
 			})
 	}
 
-	data, err := h.service.UserRegister(ctx, params)
+	data, err := h.UserService.UserRegister(ctx, params)
 	if err != nil {
 		fmt.Println("error2")
 		return ctx.Status(400).
@@ -48,11 +49,11 @@ func (h Handler) UserRegister(ctx *fiber.Ctx) error {
 		})
 }
 
-func (h Handler) UserProfile(ctx *fiber.Ctx) error {
+func (h UserHandler) UserProfile(ctx *fiber.Ctx) error {
 	params := ctx.Query("id")
-	data, err := h.service.GetUserDetail(ctx, params)
+	data, err := h.UserService.GetUserDetail(ctx, params)
 	if err != nil {
-		return ctx.Status(201).
+		return ctx.Status(404).
 			JSON(fiber.Map{
 				"status":  "failed",
 				"message": "Data not found",
@@ -67,14 +68,14 @@ func (h Handler) UserProfile(ctx *fiber.Ctx) error {
 		})
 }
 
-func (h Handler) UserLogin(ctx *fiber.Ctx) error {
+func (h UserHandler) UserLogin(ctx *fiber.Ctx) error {
 	var paramsLogin param.Login
 	err := ctx.BodyParser(&paramsLogin)
 	if err != nil {
 		return err
 	}
 
-	data, err := h.service.UserLogin(ctx, &paramsLogin)
+	data, err := h.UserService.UserLogin(ctx, &paramsLogin)
 	if err != nil {
 		return err
 	}
@@ -83,13 +84,12 @@ func (h Handler) UserLogin(ctx *fiber.Ctx) error {
 		"status": "success",
 		"data":   data.Token,
 	})
-
 }
 
-func (h Handler) UserLogout(ctx *fiber.Ctx) error {
+func (h UserHandler) UserLogout(ctx *fiber.Ctx) error {
 	params := ctx.Query("id")
 
-	res, err := h.service.UserLogout(ctx, params)
+	res, err := h.UserService.UserLogout(ctx, params)
 	if err != nil {
 		return err
 	}
@@ -98,4 +98,10 @@ func (h Handler) UserLogout(ctx *fiber.Ctx) error {
 		"status": "success",
 		"data":   res,
 	})
+}
+
+func NewUserHandler(service interfaces.UserServiceInterface) CincoUser {
+	return &UserHandler{
+		UserService: service,
+	}
 }

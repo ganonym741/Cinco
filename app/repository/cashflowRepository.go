@@ -1,30 +1,33 @@
 package repository
 
 import (
+	"time"
+
 	"github.com/gofiber/fiber/v2"
 	"gitlab.com/cinco/app/model"
 	"gitlab.com/cinco/app/repository/interfaces"
 	"gorm.io/gorm"
 )
 
-type CashflowRepository struct {
-	Db *gorm.DB
-}
+func (r Repository) FindByAccount(userUUID string, tipe string, startDate time.Time, endDate time.Time) []model.Cashflow {
+	format := "2006-01-02 15:04:05"
 
-func (c CashflowRepository) FindByAccount(ctx fiber.Ctx, userUUID string, startDate int, endDate int) []model.Cashflow {
-	query := "SELECT c.type, c.ammount, c.description, c.created_at FROM Cashflow c " +
-		"INNER JOIN Account a ON c.account_uuid = a.account_uuid " +
-		"INNER JOIN User u ON a.user_uuid = u.user_uuid "
-	if len(userUUID) != 0 && userUUID != "" {
-		query += "WHERE u.user_uuid = ? " + userUUID
+	var query = "SELECT c.id, c.type, c.amount, c.balance_history, c.description " +
+		"FROM cashflows c " +
+		"INNER JOIN accounts a ON c.account_id  = a.id " +
+		"INNER JOIN users u ON a.user_id = u.id " +
+		"WHERE u.id = '" + userUUID + "' "
+
+	if len(tipe) > 0 && tipe != "" {
+		query += " AND c.type = '" + tipe + "' "
 	}
 
-	if startDate > 0 && endDate > 0 {
-		query += "AND c.created_at BETWEEN ++ " +
-			"AND "
+	if !startDate.IsZero() && !endDate.IsZero() {
+		query += " AND c.created_at BETWEEN '" + Bod(startDate).Format(format) + "' AND '" + Eod(endDate).Format(format) + "'"
 	}
+
 	var cashflows []model.Cashflow
-	c.Db.Raw(query).Scan(&cashflows)
+	r.Db.Raw(query).Scan(&cashflows)
 
 	return cashflows
 }
@@ -34,6 +37,18 @@ func (r Repository) PostTransaction(ctx *fiber.Ctx, body *model.Cashflow) error 
 	return err
 }
 
-func NewCashflowRepository() interfaces.CashflowRepositoryInterface {
-	return &CashflowRepository{}
+func Bod(t time.Time) time.Time {
+	year, month, day := t.Date()
+	return time.Date(year, month, day, 0, 0, 0, 0, t.Location())
+}
+
+func Eod(t time.Time) time.Time {
+	year, month, day := t.Date()
+	return time.Date(year, month, day, 23, 59, 59, 0, t.Location())
+}
+
+func NewCashflowRepository(db *gorm.DB) interfaces.CashflowRepositoryInterface {
+	return &Repository{
+		Db: db,
+	}
 }

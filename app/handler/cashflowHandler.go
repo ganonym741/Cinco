@@ -1,15 +1,23 @@
 package handler
 
 import (
-	"github.com/gofiber/fiber/v2"
+	"strconv"
+
 	"gitlab.com/cinco/app/model"
+	"gitlab.com/cinco/app/service/interfaces"
+
+	"github.com/gofiber/fiber/v2"
 )
 
 type CincoCashflow interface {
-	DoTransaction()
-	CashflowEdit()
-	CashflowDelete()
-	CashflowHistory()
+	DoTransaction(ctx *fiber.Ctx) error
+	CashflowEdit(c *fiber.Ctx) error
+	CashflowDelete(c *fiber.Ctx) error
+	CashflowHistory(c *fiber.Ctx) error
+}
+
+type Handler struct {
+	cashflowService interfaces.CashflowServiceInterface
 }
 
 func (h Handler) DoTransaction(ctx *fiber.Ctx) error {
@@ -21,7 +29,7 @@ func (h Handler) DoTransaction(ctx *fiber.Ctx) error {
 	}
 
 	if body.Type == "debet" || body.Type == "kredit" {
-		err := h.service.AddTransaction(ctx, &body)
+		err := h.cashflowService.AddTransaction(ctx, &body)
 		if err != nil {
 			return ctx.Status(501).JSON(fiber.Map{"status": "Failed", "message": "Server sedang bermasalah, silahkan coba beberapa saat lagi", "data": nil})
 		}
@@ -42,5 +50,22 @@ func (h Handler) CashflowDelete(c *fiber.Ctx) error {
 }
 
 func (h Handler) CashflowHistory(c *fiber.Ctx) error {
-	return nil
+	startDate, _ := strconv.ParseInt(c.Query("startdate"), 10, 64)
+	endDate, _ := strconv.ParseInt(c.Query("enddate"), 10, 64)
+	uuid := c.Query("uuid")
+	tipe := c.Query("type")
+
+	if len(uuid) <= 0 || startDate <= 0 || endDate <= 0 {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"status": fiber.StatusBadRequest, "message": "bad request", "data": nil})
+	}
+
+	cashflows := h.cashflowService.FindTransactionLog(uuid, tipe, startDate, endDate)
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"status": fiber.StatusOK, "message": "success", "data": cashflows})
+}
+
+func NewCashflowHandler(service interfaces.CashflowServiceInterface) CincoCashflow {
+	return &Handler{
+		cashflowService: service,
+	}
 }

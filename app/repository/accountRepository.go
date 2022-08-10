@@ -3,9 +3,15 @@ package repository
 import (
 	"github.com/gofiber/fiber/v2"
 	"gitlab.com/cinco/app/model"
+	"gitlab.com/cinco/app/repository/interfaces"
+	"gorm.io/gorm"
 )
 
-func (r Repository) Create(ctx *fiber.Ctx, account model.Account) error {
+type Repository struct {
+	Db *gorm.DB
+}
+
+func (r Repository) Create(account model.Account) error {
 	err := r.Db.Create(&account).Error
 	return err
 }
@@ -26,4 +32,10 @@ func (r Repository) UpdateBalance(ctx *fiber.Ctx, params string, balance int) er
 		return err
 	}
 	return nil
+}
+
+func NewAccountRepository(db *gorm.DB) interfaces.AccountRepositoryInterface {
+	return &Repository{
+		Db: db,
+	}
 }

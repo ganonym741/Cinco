@@ -6,5 +6,7 @@ import (
 )
 
 type AccountRepositoryInterface interface {
-	Create(ctx fiber.Ctx, account model.Account) error
+	UpdateBalance(ctx *fiber.Ctx, params string, balance int) error
+	Create(account model.Account) error
+	GetBalance(ctx *fiber.Ctx, params string) (int, error)
 }
