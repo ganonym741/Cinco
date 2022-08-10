@@ -31,6 +31,7 @@ func AllRouter(app *fiber.App, service service.Service) {
 	app.Use(utilities.TokenVerify())
 
 	api.Get("/user/profile", utilities.Authorization(true), Handler.UserProfile)
+	api.Post("/user/logout", utilities.Authorization(true), Handler.UserLogout)
 	//>>>>>>> feature/registerLogin/v1/cinco
 
 	// api.Post("/user/activation", Handler.AccountActivation)

@@ -11,43 +11,11 @@ type Handler struct {
 	service service.Service
 }
 
-//<<<<<<< HEAD
 func NewHandler(s service.Service) Handler {
 	return Handler{
 		service: s,
 	}
 }
-
-// type CincoUser interface {
-// 	UserRegister()
-// 	UserLogin()
-// 	UserLogout()
-// 	UserProfile()
-// }
-
-// func UserRegister(c *fiber.Ctx) error {
-//=======
-//func UserRegister(c *fiber.Ctx) error {
-//	db := db.DB
-//>>>>>>> feature/registerLogin/v1/cinco
-//
-//	inputUser := new(param.User)
-//	inputUser.Id = uuid.New().String()
-//	err := c.BodyParser(inputUser)
-//	if err != nil {
-//		return c.Status(500).JSON(fiber.Map{
-//			"status":  "error",
-//			"message": "Review your input",
-//			"data":    err,
-//		})
-//	}
-//	inputUser.Password, _ = utilities.GeneratePassword(inputUser.Password)
-//	fmt.Println(inputUser.Password)
-//
-//	db.Create(&inputUser)
-//
-//<<<<<<< HEAD
-// }
 
 func (h Handler) UserRegister(ctx *fiber.Ctx) error {
 	var params *param.User
@@ -116,6 +84,14 @@ func (h Handler) UserLogin(ctx *fiber.Ctx) error {
 
 }
 
-////func UserLogout(c *fiber.Ctx) error {
-////
-////}
+func (h Handler) UserLogout(ctx *fiber.Ctx) error {
+	res, err := h.service.UserLogout(ctx)
+	if err != nil {
+		return err
+	}
+
+	return ctx.Status(200).JSON(fiber.Map{
+		"status": "success",
+		"data":   res,
+	})
+}

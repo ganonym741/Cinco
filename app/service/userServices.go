@@ -3,7 +3,9 @@ package service
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
+	"gitlab.com/cinco/configs"
 	utilities "gitlab.com/cinco/utils"
+	"strings"
 	"time"
 
 	"gitlab.com/cinco/app/model"
@@ -84,4 +86,17 @@ func (s Service) UserLogin(ctx *fiber.Ctx, params *param.Login) (*response.Login
 		Token:    token,
 	}, nil
 
+}
+
+func (s Service) UserLogout(ctx *fiber.Ctx) (*response.LogoutResponse, error) {
+	configs := configs.Config()
+	token := strings.Split(ctx.Get("Authorization"), " ")
+	claim, _ := utilities.ExtractClaims(configs.Jwtconfig.Secret, token[1])
+	claim["exp"] = time.Now().Add(-time.Hour)
+
+	return &response.LogoutResponse{
+		Status:   "success",
+		Messages: "logout",
+		Token:    "",
+	}, nil
 }

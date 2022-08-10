@@ -13,4 +13,10 @@ type (
 		Messages string `json:"message"`
 		Token    string `json:"token"`
 	}
+
+	LogoutResponse struct {
+		Status   string `json:"status"`
+		Messages string `json:"message"`
+		Token    string `json:"token"`
+	}
 )
