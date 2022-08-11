@@ -4,6 +4,7 @@ go 1.18
 
 require (
 	github.com/gofiber/fiber/v2 v2.36.0
+	github.com/gofiber/template v1.6.30
 	golang.org/x/crypto v0.0.0-20220214200702-86341886e292
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 	gorm.io/driver/postgres v1.3.8
