@@ -29,9 +29,12 @@ func (u UserService) FindByID(userUUID string) model.User {
 	return u.userRepository.FindById(userUUID)
 }
 
-func (u UserService) UserRegister(ctx *fiber.Ctx, params *param.User) (*response.RegisterResponse, error) {
+func (u UserService) UserRegister(ctx *fiber.Ctx, params *param.User) (*model.User, error) {
 	params.Id = uuid.New().String()
 	params.Password, _ = utilities.GeneratePassword(params.Password)
+	activationLink := "Hallo," + params.Fullname + ", please actvate your account " +
+		"<a href= \"http://" + configs.Config().Host + "/api/user/activation/" + params.Id + "\">here!</a>"
+
 	date, _ := time.Parse(utilities.LayoutFormat, params.BirthDate)
 
 	createdRegister := model.User{
@@ -50,15 +53,12 @@ func (u UserService) UserRegister(ctx *fiber.Ctx, params *param.User) (*response
 		return nil, err
 	}
 
-	err = utilities.SendMail(params.Email, params.Id)
+	err = utilities.SendMail(params.Email, activationLink)
 	if err != nil {
 		return nil, err
 	}
 
-	return &response.RegisterResponse{
-		Messages: "Register Success Check Your Email to Activated",
-		Data:     createdRegister,
-	}, nil
+	return &createdRegister, nil
 }
 
 func (u UserService) GetUserDetail(ctx *fiber.Ctx, userid string) (*model.User, error) {

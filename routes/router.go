@@ -16,7 +16,7 @@ func AllRouter(app *fiber.App, db *gorm.DB) {
 	accountRepository := repository.NewAccountRepository(db)
 	userRepository := repository.NewUserRepository(db)
 
-	cashflowService := service.NewCashflowService(cashflowRepository)
+	cashflowService := service.NewCashflowService(cashflowRepository, accountRepository)
 	accountService := service.NewAccountService(accountRepository)
 	userService := service.NewUserService(userRepository)
 
@@ -29,15 +29,15 @@ func AllRouter(app *fiber.App, db *gorm.DB) {
 
 	api.Post("/user/register", userHandler.UserRegister)
 	api.Post("/user/login", userHandler.UserLogin)
+	api.Get("/user/activation/:userId", accountHandler.AccountActivation)
 
 	app.Use(utilities.TokenVerify())
 
 	api.Get("/user/profile", utilities.Authorization(true), userHandler.UserProfile)
 	api.Post("/user/logout", utilities.Authorization(true), userHandler.UserLogout)
-	api.Post("/cash", utilities.Authorization(true), cashflowHandler.DoTransaction)
 
-	api.Post("/user/activation/:userId", utilities.Authorization(true), accountHandler.AccountActivation)
 	api.Get("/cash", utilities.Authorization(true), cashflowHandler.CashflowHistory)
-	api.Put("/user/:cashflowId/:accountId", cashflowHandler.CashflowEdit)
-	api.Delete("/user/:cashflowId", cashflowHandler.CashflowDelete)
+	api.Post("/cash", utilities.Authorization(true), cashflowHandler.DoTransaction)
+	api.Put("/cash/:cashflowId/:accountId", utilities.Authorization(true), cashflowHandler.CashflowEdit)
+	api.Delete("/cash/:cashflowId/:accountId", utilities.Authorization(true), cashflowHandler.CashflowDelete)
 }

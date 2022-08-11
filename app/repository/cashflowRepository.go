@@ -34,7 +34,9 @@ func (r Repository) FindByAccount(userUUID string, tipe string, startDate time.T
 }
 
 func (r Repository) PostTransaction(ctx *fiber.Ctx, body *model.Cashflow) error {
-	err := r.Db.Create(&body).Error
+	fmt.Println("ini beody", body)
+	err := r.Db.Create(body).Error
+	fmt.Println(err)
 	return err
 }
 

@@ -28,8 +28,8 @@ func (h Handler) DoTransaction(ctx *fiber.Ctx) error {
 		return ctx.Status(501).JSON(fiber.Map{"status": "Failed", "message": "Periksa kembali inputan anda", "data": nil})
 	}
 
-	if body.Type == "debet" || body.Type == "kredit" {
-		err := h.cashflowService.AddTransaction(ctx, &body)
+	if body.Type == "debet" || body.Type == "credit" {
+		err := h.cashflowService.AddTransaction(ctx, body)
 		if err != nil {
 			return ctx.Status(501).JSON(fiber.Map{"status": "Failed", "message": "Server sedang bermasalah, silahkan coba beberapa saat lagi", "data": nil})
 		}
@@ -59,6 +59,7 @@ func (h Handler) CashflowHistory(ctx *fiber.Ctx) error {
 func (h Handler) CashflowEdit(ctx *fiber.Ctx) error {
 	params := ctx.Params("cashflowId")
 	paramsIdAccount := ctx.Params("accountId")
+	// paramDate := ctx.Params("date")
 
 	var modelcashflow model.Cashflow
 	ctx.BodyParser(&modelcashflow)
@@ -78,8 +79,9 @@ func (h Handler) CashflowEdit(ctx *fiber.Ctx) error {
 
 func (h Handler) CashflowDelete(ctx *fiber.Ctx) error {
 	params := ctx.Params("cashflowId")
+	paramsIdAccount := ctx.Params("accountId")
 
-	data, err := h.cashflowService.DeleteCashflow(ctx, params)
+	data, err := h.cashflowService.DeleteCashflow(ctx, params, paramsIdAccount)
 	if err != nil {
 		return ctx.Status(200).
 			JSON(fiber.Map{"status": "failed", "message": "Data not found", "data": nil})

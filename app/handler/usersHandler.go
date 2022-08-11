@@ -44,7 +44,7 @@ func (h UserHandler) UserRegister(ctx *fiber.Ctx) error {
 	return ctx.Status(201).
 		JSON(fiber.Map{
 			"status":  "success",
-			"message": "User data created",
+			"message": "Register Success Check Your Email to Activated",
 			"data":    data,
 		})
 }
