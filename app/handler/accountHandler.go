@@ -26,11 +26,8 @@ func (a AccountHandler) AccountActivation(ctx *fiber.Ctx) error {
 				"message": "User not found",
 				"closure": "please contact your system administrator. Good Luck.",
 			})
-			//return ctx.Status(fiber.StatusNotFound).JSON(fiber.Map{"status": fiber.StatusNotFound, "message": "User not found"})
 		} else {
 			if user.Status {
-				//utilities.SendMail(user.Email, "your account is already activated, please contact system administrator.")
-				//return ctx.Status(fiber.StatusOK).JSON(fiber.Map{"status": fiber.StatusConflict, "message": "user already activated"})
 				return ctx.Render("notification", fiber.Map{
 					"name":    user.Fullname,
 					"message": "your account is already activated",
@@ -40,8 +37,6 @@ func (a AccountHandler) AccountActivation(ctx *fiber.Ctx) error {
 			err := a.AccountService.CreateAccount(userUUID)
 
 			if err != nil {
-				//utilities.SendMail(user.Email, "error in creating account, please contact system administrator.")
-				//return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"status": fiber.StatusInternalServerError, "message": err.Error()})
 				return ctx.Render("notification", fiber.Map{
 					"name":    user.Fullname,
 					"message": "error in creating account",
@@ -54,8 +49,6 @@ func (a AccountHandler) AccountActivation(ctx *fiber.Ctx) error {
 			err = a.UserService.Update(user)
 
 			if err != nil {
-				//utilities.SendMail(user.Email, "failed to activate your account, please contact system administrator.")
-				//return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"status": fiber.StatusInternalServerError, "message": err.Error()})
 				return ctx.Render("notification", fiber.Map{
 					"name":    user.Fullname,
 					"message": "failed to activate your account",
@@ -63,8 +56,6 @@ func (a AccountHandler) AccountActivation(ctx *fiber.Ctx) error {
 				})
 			}
 
-			//utilities.SendMail(user.Email, "your account has been activated successfully.")
-			//return c.Status(fiber.StatusOK).JSON(fiber.Map{"status": "success", "message": "User data has been activated successfully."})
 			return ctx.Render("notification", fiber.Map{
 				"name":    user.Fullname,
 				"message": "your account has been activated successfully.",
@@ -73,7 +64,11 @@ func (a AccountHandler) AccountActivation(ctx *fiber.Ctx) error {
 		}
 	}
 
-	return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"status": fiber.StatusBadRequest, "message": "bad url request", "data": nil})
+	return ctx.Render("notification", fiber.Map{
+		"name":    "there",
+		"message": "bad url request.",
+		"closure": "please contact your system administrator.",
+	})
 }
 
 func NewAccountHandler(accountService interfaces.AccountServiceInterface, serviceInterface interfaces.UserServiceInterface) CincoAccount {
