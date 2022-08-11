@@ -48,7 +48,7 @@ func (h Handler) UserProfile(ctx *fiber.Ctx) error {
 	params := ctx.Query("id")
 	data, err := h.service.GetUserDetail(ctx, params)
 	if err != nil {
-		return ctx.Status(201).
+		return ctx.Status(404).
 			JSON(fiber.Map{
 				"status":  "failed",
 				"message": "Data not found",
