@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"gitlab.com/cinco/configs"
@@ -101,6 +102,10 @@ func (s Service) UserLogout(ctx *fiber.Ctx, params string) (*response.LogoutResp
 	}
 
 	claim["exp"] = time.Now().Add(-time.Hour)
+
+	header := ctx.GetRespHeader("exp")
+	fmt.Println(header)
+
 	return &response.LogoutResponse{
 		Status:   "success",
 		Messages: "logout",

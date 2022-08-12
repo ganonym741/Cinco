@@ -4,6 +4,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"gitlab.com/cinco/app/param"
 	"gitlab.com/cinco/app/service"
+	utilities "gitlab.com/cinco/utils"
 )
 
 type Handler struct {
@@ -25,6 +26,12 @@ func (h Handler) UserRegister(ctx *fiber.Ctx) error {
 				"status": "failed",
 				"data":   nil,
 			})
+	}
+
+	errors := utilities.ValidateStruct(*params)
+	if errors != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(errors)
+
 	}
 
 	data, err := h.service.UserRegister(ctx, params)
