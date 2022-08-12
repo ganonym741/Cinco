@@ -41,7 +41,7 @@ func (h UserHandler) UserRegister(ctx *fiber.Ctx) error {
 	data, err := h.UserService.UserRegister(ctx, params)
 	if err != nil {
 		fmt.Println("error2")
-		return ctx.Status(400).
+		return ctx.Status(500).
 			JSON(fiber.Map{
 				"status": "failed",
 				"data":   nil,

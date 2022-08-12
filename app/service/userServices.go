@@ -62,8 +62,8 @@ func (u UserService) UserRegister(ctx *fiber.Ctx, params *param.User) (*model.Us
 	return &createdRegister, nil
 }
 
-func (u UserService) GetUserDetail(ctx *fiber.Ctx, userid string) (*model.User, error) {
-	var data model.User
+func (u UserService) GetUserDetail(ctx *fiber.Ctx, userid string) (*response.ProfileDetail, error) {
+	var data response.ProfileDetail
 	err := u.userRepository.GetUserDetail(ctx, &data, userid)
 	if err != nil {
 		return nil, err

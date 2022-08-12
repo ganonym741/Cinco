@@ -4,10 +4,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strings"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v4"
 	"gitlab.com/cinco/configs"
-	"strings"
 )
 
 func ExtractClaims(secret, tokenStr string) (jwt.MapClaims, error) {
@@ -50,9 +51,7 @@ func TokenVerify() fiber.Handler {
 		for key, val := range result {
 			valStr := fmt.Sprintf(`%v`, val)
 			ctx.Set(key, valStr)
-			//fmt.Println(key, valStr)
 		}
-		//fmt.Println("ini c get di atas =", c.GetReqHeaders())
 		return ctx.Next()
 	}
 }
@@ -64,7 +63,7 @@ func Authorization(status bool) fiber.Handler {
 		claim, _ := ExtractClaims(configs.Jwtconfig.Secret, token[1])
 		if claim["status"] != status {
 			return ctx.Status(403).JSON(fiber.Map{
-				"status":  "failed",
+				"status":  "Failed",
 				"message": "Account not activate",
 				"data":    nil,
 			})

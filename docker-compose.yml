@@ -1,0 +1,25 @@
+services:
+  usecase-postgresql:
+    image: ganonym776/usecase-postgresql
+    container_name: usecase-postgresql
+    restart: unless-stopped
+    environment:
+      - POSTGRES_PASSWORD=cinco
+      - POSTGRES_USER=cinco
+      - POSTGRES_DB=cinco
+    ports:
+      - 5433:5432
+
+  cinco-backend:
+    image: ganonym776/be-kelompok-2
+    container_name: cinco-backend
+    environment:
+      - DB_HOST=usecase-postgresql
+      - DB_NAME=cinco
+      - DB_USER=cinco
+      - DB_PASSWORD=cinco
+      - DB_PORT=5432
+    ports:
+      - 8000:8000
+    depends_on:
+      - usecase-postgresql
