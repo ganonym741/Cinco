@@ -7,7 +7,7 @@ import (
 type Account struct {
 	Id        string     `gorm:"type:uuid;primary_key" json:"Id"`
 	UserId    string     `gorm:"type:uuid" json:"userid,omitempty"`
-	Balance   int        `json:"balance"`
-	CreatedAt time.Time  `json:"created_at"`
-	UpdatedAt *time.Time `json:"updated_at"`
+	Balance   int        `json:"balance,omitempty"`
+	CreatedAt time.Time  `json:"created_at,omitempty"`
+	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 }
