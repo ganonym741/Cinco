@@ -1,0 +1,372 @@
+{
+	"info": {
+		"_postman_id": "d1511574-098e-4ac0-80c6-f635c4b7cb4d",
+		"name": "cinco",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "22068585"
+	},
+	"item": [
+		{
+			"name": "add cashflow",
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"accountid\":\"b686bdd2-05ee-4720-8254-5181a66cc1ca\",\n    \"type\":\"debet\",\n    \"description\":\"trx\",\n    \"amount\":35000,\n    \"issued_at\":\"2012-04-23T18:25:43.511Z\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8000/api/cash",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"cash"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "user show detail",
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8000/api/user/profile?id={{user_id}}",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"user",
+						"profile"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "{{user_id}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "user register",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"postman.setEnvironmentVariable(\"user_id\", jsonData.data.id);",
+							"postman.setEnvironmentVariable(\"username\", jsonData.data.username);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\":\"agung\",\n    \"password\":\"purnomo\",\n    \"fullname\":\"gunawan prasetya\",\n    \"email\":\"gunawan.anonym776@gmail.com\",\n    \"birth_date\":\"1000-01-01T00:00:00Z\",\n    \"domicile\":\"Yogyakarta\",\n    \"occupation\":\"-\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8000/api/user/register",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"user",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "user login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"postman.setEnvironmentVariable(\"token\", jsonData.data);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"identity\":\"prasetya\",\n    \"password\":\"prasetya\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8000/api/user/login",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"user",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "user activation",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8000/api/user/activation/{{user_id}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"user",
+						"activation",
+						"{{user_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "user logout",
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "localhost:8000/api/user/logout?id={{user_id}}",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"user",
+						"logout"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "{{user_id}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get cashflow",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"postman.setEnvironmentVariable(\"cashflow_id\", jsonData.data[0].id);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8000/api/cash/type?startdate=1660007107&enddate=1660176231&uuid={{user_id}}",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"cash",
+						"type"
+					],
+					"query": [
+						{
+							"key": "startdate",
+							"value": "1660007107"
+						},
+						{
+							"key": "enddate",
+							"value": "1660176231"
+						},
+						{
+							"key": "type",
+							"value": "",
+							"disabled": true
+						},
+						{
+							"key": "uuid",
+							"value": "{{user_id}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "edit cashflow",
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"description\":\"ganti\",\n    \"amount\":50000\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8000/api/cash/:cashflowId/:accountId",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"cash",
+						":cashflowId",
+						":accountId"
+					],
+					"variable": [
+						{
+							"key": "cashflowId",
+							"value": "5f75af52-0069-428b-8aac-0d442504e018"
+						},
+						{
+							"key": "accountId",
+							"value": "b686bdd2-05ee-4720-8254-5181a66cc1ca"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete cashflow",
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "localhost:8000/api/cash/:cashflowId",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"cash",
+						":cashflowId"
+					],
+					"variable": [
+						{
+							"key": "cashflowId",
+							"value": "{{cashflow_id}}"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

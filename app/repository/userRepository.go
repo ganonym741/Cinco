@@ -4,6 +4,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"gitlab.com/cinco/app/model"
 	"gitlab.com/cinco/app/repository/interfaces"
+	"gitlab.com/cinco/app/response"
 
 	"gorm.io/gorm"
 )
@@ -35,8 +36,8 @@ func (u UserRepository) FindById(userUUID string) model.User {
 	return user
 }
 
-func (u UserRepository) GetUserDetail(ctx *fiber.Ctx, user *model.User, params string) error {
-	err := u.Db.First(&user, "id = ?", params).Error
+func (u UserRepository) GetUserDetail(ctx *fiber.Ctx, user *response.ProfileDetail, params string) error {
+	err := u.Db.Raw("SELECT u.fullname, u.email, u.birth_date, u.domicile, u.occupation, a.id AS account_id, a.balance FROM public.users AS u JOIN public.accounts AS a ON u.id=a.user_id WHERE u.id = ?", params).First(&user).Error
 	return err
 }
 
