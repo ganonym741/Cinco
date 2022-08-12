@@ -57,6 +57,7 @@ func (s Service) AddTransaction(ctx *fiber.Ctx, body model.Cashflow) error {
 func (s Service) FindTransactionLog(userUUID string, tipe string, startDate int64, endDate int64) []model.Cashflow {
 	return s.cashflowRepository.FindByAccount(userUUID, tipe, time.Unix(startDate, 0), time.Unix(endDate, 0))
 }
+
 func (s Service) DeleteCashflow(ctx *fiber.Ctx, cashflowid string, paramsIdAccount string) (*model.Cashflow, error) {
 	var data model.Cashflow
 	fmt.Println("get", cashflowid, paramsIdAccount)
