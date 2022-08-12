@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	utilities "gitlab.com/cinco/utils"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -54,8 +55,8 @@ func (s Service) AddTransaction(ctx *fiber.Ctx, body model.Cashflow) error {
 	return nil
 }
 
-func (s Service) FindTransactionLog(userUUID string, tipe string, startDate int64, endDate int64) []model.Cashflow {
-	return s.cashflowRepository.FindByAccount(userUUID, tipe, time.Unix(startDate, 0), time.Unix(endDate, 0))
+func (s Service) FindTransactionLog(userUUID string, tipe string, startDate time.Time, endDate time.Time) ([]model.Cashflow, error) {
+	return s.cashflowRepository.FindByAccount(userUUID, tipe, utilities.Bod(startDate), utilities.Eod(endDate))
 }
 
 func (s Service) DeleteCashflow(ctx *fiber.Ctx, cashflowid string, paramsIdAccount string) (*model.Cashflow, error) {
