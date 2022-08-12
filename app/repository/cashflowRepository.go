@@ -1,39 +1,93 @@
 package repository
 
 import (
+	"fmt"
+	"time"
+
 	"github.com/gofiber/fiber/v2"
 	"gitlab.com/cinco/app/model"
 	"gitlab.com/cinco/app/repository/interfaces"
 	"gorm.io/gorm"
 )
 
-type CashflowRepository struct {
-	Db *gorm.DB
-}
+func (r Repository) FindByAccount(userUUID string, tipe string, startDate time.Time, endDate time.Time) []model.Cashflow {
+	format := "2006-01-02 15:04:05"
 
-func (c CashflowRepository) FindByAccount(ctx fiber.Ctx, userUUID string, startDate int, endDate int) []model.Cashflow {
-	query := "SELECT c.type, c.ammount, c.description, c.created_at FROM Cashflow c " +
-		"INNER JOIN Account a ON c.account_uuid = a.account_uuid " +
-		"INNER JOIN User u ON a.user_uuid = u.user_uuid "
-	if len(userUUID) != 0 && userUUID != "" {
-		query += "WHERE u.user_uuid = ? " + userUUID
+	var query = "SELECT c.id, c.type, c.amount, c.balance_history, c.description " +
+		"FROM cashflows c " +
+		"INNER JOIN accounts a ON c.account_id  = a.id " +
+		"INNER JOIN users u ON a.user_id = u.id " +
+		"WHERE u.id = '" + userUUID + "' "
+
+	if len(tipe) > 0 && tipe != "" {
+		query += " AND c.type = '" + tipe + "' "
 	}
 
-	if startDate > 0 && endDate > 0 {
-		query += "AND c.created_at BETWEEN ++ " +
-			"AND "
+	if !startDate.IsZero() && !endDate.IsZero() {
+		query += " AND c.created_at BETWEEN '" + Bod(startDate).Format(format) + "' AND '" + Eod(endDate).Format(format) + "'"
 	}
+
 	var cashflows []model.Cashflow
-	c.Db.Raw(query).Scan(&cashflows)
+	r.Db.Raw(query).Scan(&cashflows)
 
 	return cashflows
 }
 
-func NewCashflowRepository() interfaces.CashflowRepositoryInterface {
-	return &CashflowRepository{}
+func (r Repository) PostTransaction(ctx *fiber.Ctx, body *model.Cashflow) error {
+	fmt.Println("ini beody", body)
+	err := r.Db.Create(body).Error
+	fmt.Println(err)
+	return err
 }
 
-/*func (r Repository) PostTransaction(ctx fiber.Ctx, cashflow model.Cashflow) error {
-	err := r.Db.Create(&cashflow).Error
+func (r Repository) DeleteCashflow(ctx *fiber.Ctx, deleteCashFlow *model.Cashflow, params string) error {
+
+	err := r.Db.Delete(&deleteCashFlow, "id = ?", params).Error
+
 	return err
-}*/
+}
+
+func (r Repository) RepoEditCashFlow(ctx *fiber.Ctx, editcashflow *model.Cashflow, params string, balancehistory int) error {
+
+	err := r.Db.Model(&model.Cashflow{}).Where("id = ?", params).Updates((map[string]interface{}{"description": editcashflow.Description, "amount": editcashflow.Amount, "balance_history": balancehistory, "updated_at": time.Now()})).Error
+
+	return err
+}
+
+func (r Repository) RepoUpdateBalance(ctx *fiber.Ctx, req *model.Account, paramsIdAccount string) error {
+
+	err := r.Db.Model(&model.Account{}).Where("id = ?", paramsIdAccount).Update("balance", req.Balance).Error
+
+	return err
+}
+
+func (r Repository) GetHistoryandAmountBefore(ctx *fiber.Ctx, params string) (int, string, int, error) {
+	var Result struct {
+		Amount         int    `json:"amount"`
+		Type           string `json:"type"`
+		BalanceHistory int    `json:"balance_history"`
+	}
+
+	// err := r.Db.Table("cashflows").Select("amount", "type").Where("user_id = ?", params).Scan(result).Error
+	err := r.Db.Raw("SELECT amount, type, balance_history FROM cashflows WHERE id = ?", params).Scan(&Result).Error
+	fmt.Println("err history before", err)
+	fmt.Println("result2", Result)
+
+	return Result.Amount, Result.Type, Result.BalanceHistory, nil
+}
+
+func Bod(t time.Time) time.Time {
+	year, month, day := t.Date()
+	return time.Date(year, month, day, 0, 0, 0, 0, t.Location())
+}
+
+func Eod(t time.Time) time.Time {
+	year, month, day := t.Date()
+	return time.Date(year, month, day, 23, 59, 59, 0, t.Location())
+}
+
+func NewCashflowRepository(db *gorm.DB) interfaces.CashflowRepositoryInterface {
+	return &Repository{
+		Db: db,
+	}
+}

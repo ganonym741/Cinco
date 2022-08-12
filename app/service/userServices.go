@@ -2,36 +2,40 @@ package service
 
 import (
 	"errors"
-	"fmt"
+
+	"strings"
+	"time"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"gitlab.com/cinco/configs"
 	utilities "gitlab.com/cinco/utils"
-	"strings"
-	"time"
 
 	"gitlab.com/cinco/app/model"
 	"gitlab.com/cinco/app/param"
-	"gitlab.com/cinco/app/repository"
+	"gitlab.com/cinco/app/repository/interfaces"
 	"gitlab.com/cinco/app/response"
-	"gitlab.com/cinco/pkg/postgres"
+	serviceInterface "gitlab.com/cinco/app/service/interfaces"
 )
 
-type Service struct {
-	repository repository.Repository
+type UserService struct {
+	userRepository interfaces.UserRepositoryInterface
 }
 
-func NewService() Service {
-	return Service{
-		repository: repository.Repository{
-			Db: postgres.ConnectDB(),
-		},
-	}
+func (u UserService) Update(user model.User) error {
+	return u.userRepository.Update(user)
 }
 
-func (s Service) UserRegister(ctx *fiber.Ctx, params *param.User) (*response.RegisterResponse, error) {
+func (u UserService) FindByID(userUUID string) model.User {
+	return u.userRepository.FindById(userUUID)
+}
+
+func (u UserService) UserRegister(ctx *fiber.Ctx, params *param.User) (*model.User, error) {
 	params.Id = uuid.New().String()
 	params.Password, _ = utilities.GeneratePassword(params.Password)
+	activationLink := "Hallo," + params.Fullname + ", please actvate your account " +
+		"<a href= \"http://" + configs.Config().Host + "/api/user/activation/" + params.Id + "\">here!</a>"
+
 	date, _ := time.Parse(utilities.LayoutFormat, params.BirthDate)
 
 	createdRegister := model.User{
@@ -45,30 +49,31 @@ func (s Service) UserRegister(ctx *fiber.Ctx, params *param.User) (*response.Reg
 		Occupation: params.Occupation,
 	}
 
-	err := s.repository.UserRegister(ctx, createdRegister)
+	err := u.userRepository.UserRegister(ctx, createdRegister)
 	if err != nil {
 		return nil, err
 	}
 
-	err = utilities.SendMail(params.Email, "")
+	err = utilities.SendMail(params.Email, activationLink)
+	if err != nil {
+		return nil, err
+	}
 
-	return &response.RegisterResponse{
-		Messages: "Register Success Check Your Email to Activated",
-		Data:     createdRegister,
-	}, nil
+	return &createdRegister, nil
 }
 
-func (s Service) GetUserDetail(ctx *fiber.Ctx, userid string) (*model.User, error) {
+func (u UserService) GetUserDetail(ctx *fiber.Ctx, userid string) (*model.User, error) {
 	var data model.User
-	err := s.repository.GetUserDetail(ctx, &data, userid)
+	err := u.userRepository.GetUserDetail(ctx, &data, userid)
 	if err != nil {
 		return nil, err
 	}
+
 	return &data, nil
 }
 
-func (s Service) UserLogin(ctx *fiber.Ctx, params *param.Login) (*response.LoginResponse, error) {
-	result, err := s.repository.GetUserByIdentity(ctx, params.Identity)
+func (u UserService) UserLogin(ctx *fiber.Ctx, params *param.Login) (*response.LoginResponse, error) {
+	result, err := u.userRepository.GetUserByIdentity(ctx, params.Identity)
 	if err != nil {
 		return nil, err
 	}
@@ -78,7 +83,7 @@ func (s Service) UserLogin(ctx *fiber.Ctx, params *param.Login) (*response.Login
 		return nil, errors.New("wrong email or password ")
 	}
 
-	if result.Status != true {
+	if !result.Status {
 		return nil, errors.New("your account is deactive")
 	}
 
@@ -91,7 +96,7 @@ func (s Service) UserLogin(ctx *fiber.Ctx, params *param.Login) (*response.Login
 	}, nil
 }
 
-func (s Service) UserLogout(ctx *fiber.Ctx, params string) (*response.LogoutResponse, error) {
+func (u UserService) UserLogout(ctx *fiber.Ctx, params string) (*response.LogoutResponse, error) {
 	configs := configs.Config()
 	token := strings.Split(ctx.Get("Authorization"), " ")
 	claim, _ := utilities.ExtractClaims(configs.Jwtconfig.Secret, token[1])
@@ -101,14 +106,17 @@ func (s Service) UserLogout(ctx *fiber.Ctx, params string) (*response.LogoutResp
 		return nil, err
 	}
 
-	claim["exp"] = time.Now().Add(-time.Hour)
-
-	header := ctx.GetRespHeader("exp")
-	fmt.Println(header)
+	claim["exp"] = -1
 
 	return &response.LogoutResponse{
 		Status:   "success",
 		Messages: "logout",
 		Token:    "",
 	}, nil
+}
+
+func NewUserService(repository interfaces.UserRepositoryInterface) serviceInterface.UserServiceInterface {
+	return &UserService{
+		userRepository: repository,
+	}
 }

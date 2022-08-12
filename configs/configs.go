@@ -25,6 +25,7 @@ type ConfJWT struct {
 type Configs struct {
 	Dbconfig  ConfDB
 	Jwtconfig ConfJWT
+	Host      string
 }
 
 var configs *Configs
@@ -52,6 +53,7 @@ func Config() *Configs {
 				Secret:  os.Getenv("JWT_SECRET"),
 				Expired: JwtExpired,
 			},
+			Host: os.Getenv("HOST"),
 		}
 		lock.Unlock()
 	}

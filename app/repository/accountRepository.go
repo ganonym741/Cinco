@@ -7,15 +7,35 @@ import (
 	"gorm.io/gorm"
 )
 
-type AccoutRepository struct {
+type Repository struct {
 	Db *gorm.DB
 }
 
-func (a AccoutRepository) Create(ctx fiber.Ctx, account model.Account) error {
-	err := a.Db.Create(&account).Error
+func (r Repository) Create(account model.Account) error {
+	err := r.Db.Create(&account).Error
 	return err
 }
 
-func NewAccountRepository() interfaces.AccountRepositoryInterface {
-	return &AccoutRepository{}
+func (r Repository) GetBalance(ctx *fiber.Ctx, params string) (int, error) {
+	var balance int
+	err := r.Db.Raw("SELECT balance FROM public.accounts WHERE id = ?", params).Scan(&balance).Error
+	if err != nil {
+		return 0, err
+	}
+	return balance, nil
+}
+
+func (r Repository) UpdateBalance(ctx *fiber.Ctx, params string, balance int) error {
+	var account model.Account
+	err := r.Db.Model(&account).Where("id = ?", params).Update("balance", balance).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func NewAccountRepository(db *gorm.DB) interfaces.AccountRepositoryInterface {
+	return &Repository{
+		Db: db,
+	}
 }

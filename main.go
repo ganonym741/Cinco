@@ -1,19 +1,28 @@
 package main
 
 import (
+	"io"
+
 	"github.com/gofiber/fiber/v2"
-	"gitlab.com/cinco/app/service"
+	"github.com/gofiber/template/html"
 	"gitlab.com/cinco/pkg/postgres"
 	"gitlab.com/cinco/routes"
 )
 
 func main() {
-	app := fiber.New()
+	engine := html.New("./templates", ".html")
 
-	postgres.ConnectDB()
+	app := fiber.New(fiber.Config{
+		Views: engine,
+	})
 
-	appService := service.NewService()
+	db := postgres.ConnectDB()
 
-	routes.AllRouter(app, appService)
+	routes.AllRouter(app, db)
 	app.Listen(":8000")
+}
+
+type Views interface {
+	Load() error
+	Render(io.Writer, string, interface{}, ...string) error
 }
