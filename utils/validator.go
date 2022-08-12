@@ -1,6 +1,8 @@
 package utilities
 
 import (
+	"fmt"
+
 	"github.com/go-playground/validator/v10"
 	"gitlab.com/cinco/app/param"
 )
@@ -25,5 +27,6 @@ func ValidateStruct(user param.User) []*ErrorResponse {
 			errors = append(errors, &element)
 		}
 	}
+	fmt.Println(errors)
 	return errors
 }
