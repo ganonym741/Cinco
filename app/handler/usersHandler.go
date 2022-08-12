@@ -23,8 +23,8 @@ func (h Handler) UserRegister(ctx *fiber.Ctx) error {
 	if err != nil {
 		return ctx.Status(400).
 			JSON(fiber.Map{
-				"status": "failed",
-				"data":   nil,
+				"status":   "failed",
+				"messages": "correct your input",
 			})
 	}
 
