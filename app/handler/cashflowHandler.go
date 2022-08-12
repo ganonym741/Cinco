@@ -48,12 +48,16 @@ func (h Handler) CashflowHistory(ctx *fiber.Ctx) error {
 	tipe := ctx.Query("type")
 
 	if len(uuid) <= 0 || startDate <= 0 || endDate <= 0 {
-		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"status": fiber.StatusBadRequest, "message": "bad request", "data": nil})
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"status": "bad request", "message": "bad request"})
 	}
 
 	cashflows := h.cashflowService.FindTransactionLog(uuid, tipe, startDate, endDate)
 
-	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{"status": fiber.StatusOK, "message": "success", "data": cashflows})
+	if len(cashflows) <= 0 {
+		return ctx.Status(fiber.StatusNoContent).JSON(fiber.Map{"status": "data not found", "message": "no record found"})
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{"status": "success", "message": "success", "data": cashflows})
 }
 
 func (h Handler) CashflowEdit(ctx *fiber.Ctx) error {
