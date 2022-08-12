@@ -101,7 +101,7 @@ func (s Service) DeleteCashflow(ctx *fiber.Ctx, cashflowid string, paramsIdAccou
 	return &data, nil
 }
 
-func (s Service) EditCashflow(ctx *fiber.Ctx, body *model.Cashflow, reqUpdate *model.Account, params, paramsIdAccount string) (*model.Cashflow, error) {
+func (s Service) EditCashflow(ctx *fiber.Ctx, body *model.Cashflow, reqUpdate *model.Account, params, paramsIdAccount string) (*model.ResoponseCashflow, error) {
 
 	data := model.Cashflow{
 		Description: body.Description,
@@ -155,7 +155,11 @@ func (s Service) EditCashflow(ctx *fiber.Ctx, body *model.Cashflow, reqUpdate *m
 
 	fmt.Println(balance)
 
-	return &data, nil
+	return &model.ResoponseCashflow{
+		Description:    body.Description,
+		Amount:         body.Amount,
+		BalanceHistory: balance,
+	}, nil
 }
 
 func NewCashflowService(repository interfaces.CashflowRepositoryInterface, accountRepository interfaces.AccountRepositoryInterface) serviceInterface.CashflowServiceInterface {

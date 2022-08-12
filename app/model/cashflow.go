@@ -16,3 +16,9 @@ type Cashflow struct {
 	IssuedAt       time.Time `json:"issued_at,omitempty"`
 	gorm.Model
 }
+
+type ResoponseCashflow struct {
+	Description    string `json:"description,omitempty"`
+	Amount         int    `json:"amount,omitempty"`
+	BalanceHistory int    `json:"balance_history,omitempty"`
+}
