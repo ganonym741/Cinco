@@ -2,8 +2,9 @@ package repository
 
 import (
 	"fmt"
-	utilities "gitlab.com/cinco/utils"
 	"time"
+
+	utilities "gitlab.com/cinco/utils"
 
 	"github.com/gofiber/fiber/v2"
 	"gitlab.com/cinco/app/model"
@@ -12,7 +13,7 @@ import (
 )
 
 func (r Repository) FindByAccount(userUUID string, tipe string, startDate time.Time, endDate time.Time) ([]model.Cashflow, error) {
-	var query = "SELECT c.id, c.type, c.amount, c.balance_history, c.description " +
+	var query = "SELECT c.id, c.type, c.amount, c.balance_history, c.description, c.issued_at, c.created_at, c.updated_at " +
 		"FROM cashflows c " +
 		"INNER JOIN accounts a ON c.account_id  = a.id INNER JOIN users u ON a.user_id = u.id " +
 		"WHERE u.id = '" + userUUID + "'"
@@ -25,6 +26,7 @@ func (r Repository) FindByAccount(userUUID string, tipe string, startDate time.T
 		query += " AND c.created_at BETWEEN '" + startDate.Format(utilities.DateTimeFormat) + "' AND '" + endDate.Format(utilities.DateTimeFormat) + "'"
 	}
 
+	query += " ORDER BY c.issued_at"
 	//fmt.Println(query)
 
 	var cashflows []model.Cashflow

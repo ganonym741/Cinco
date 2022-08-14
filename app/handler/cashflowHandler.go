@@ -1,8 +1,9 @@
 package handler
 
 import (
-	utilities "gitlab.com/cinco/utils"
 	"time"
+
+	utilities "gitlab.com/cinco/utils"
 
 	"gitlab.com/cinco/app/model"
 	"gitlab.com/cinco/app/service/interfaces"
@@ -39,7 +40,7 @@ func (h Handler) DoTransaction(ctx *fiber.Ctx) error {
 	}
 
 	return ctx.Status(201).
-		JSON(fiber.Map{"status": "success", "message": "Transaksi baru telah ditambahkan", "data": body})
+		JSON(fiber.Map{"status": "success", "message": "Transaksi baru telah ditambahkan"})
 }
 
 func (h Handler) CashflowHistory(ctx *fiber.Ctx) error {
@@ -95,13 +96,13 @@ func (h Handler) CashflowDelete(ctx *fiber.Ctx) error {
 	params := ctx.Params("cashflowId")
 	paramsIdAccount := ctx.Params("accountId")
 
-	data, err := h.cashflowService.DeleteCashflow(ctx, params, paramsIdAccount)
+	_, err := h.cashflowService.DeleteCashflow(ctx, params, paramsIdAccount)
 	if err != nil {
 		return ctx.Status(404).
 			JSON(fiber.Map{"status": "Failed", "message": "Data not found", "data": nil})
 	}
 	return ctx.Status(201).
-		JSON(fiber.Map{"status": "Success", "message": "User data retrieved", "data": data})
+		JSON(fiber.Map{"status": "Success", "message": "User data retrieved"})
 }
 
 func NewCashflowHandler(service interfaces.CashflowServiceInterface) CincoCashflow {

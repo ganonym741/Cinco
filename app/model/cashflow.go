@@ -5,7 +5,7 @@ import (
 )
 
 type Cashflow struct {
-	Id             string     `gorm:"type:uuid;primary_key" json:"id"`
+	Id             string     `gorm:"type:uuid;primary_key" json:"id,omitempty"`
 	AccountId      string     `gorm:"type:uuid" json:"accountid,omitempty"`
 	Type           string     `json:"type,omitempty"`
 	Description    string     `json:"description,omitempty"`
