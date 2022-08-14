@@ -3,6 +3,8 @@ package handler
 import (
 	"fmt"
 
+	utilities "gitlab.com/cinco/utils"
+
 	"github.com/gofiber/fiber/v2"
 	"gitlab.com/cinco/app/param"
 	"gitlab.com/cinco/app/service/interfaces"
@@ -26,9 +28,15 @@ func (h UserHandler) UserRegister(ctx *fiber.Ctx) error {
 		fmt.Println("error1")
 		return ctx.Status(400).
 			JSON(fiber.Map{
-				"status": "failed",
-				"data":   nil,
+				"status":   "failed",
+				"messages": "correct your input",
 			})
+	}
+
+	errors := utilities.ValidateStruct(*params)
+	if errors != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(errors)
+
 	}
 
 	data, err := h.UserService.UserRegister(ctx, params)

@@ -64,7 +64,11 @@ func (a AccountHandler) AccountActivation(ctx *fiber.Ctx) error {
 		}
 	}
 
-	return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"status": fiber.StatusBadRequest, "message": "bad url request", "data": nil})
+	return ctx.Render("notification", fiber.Map{
+		"name":    "there",
+		"message": "bad url request.",
+		"closure": "please contact your system administrator.",
+	})
 }
 
 func NewAccountHandler(accountService interfaces.AccountServiceInterface, serviceInterface interfaces.UserServiceInterface) CincoAccount {

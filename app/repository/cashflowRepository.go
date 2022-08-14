@@ -49,7 +49,7 @@ func (r Repository) DeleteCashflow(ctx *fiber.Ctx, deleteCashFlow *model.Cashflo
 
 func (r Repository) RepoEditCashFlow(ctx *fiber.Ctx, editcashflow *model.Cashflow, params string, balancehistory int) error {
 
-	err := r.Db.Model(&model.Cashflow{}).Where("id = ?", params).Updates((map[string]interface{}{"description": editcashflow.Description, "amount": editcashflow.Amount, "balance_history": balancehistory})).Error
+	err := r.Db.Model(&model.Cashflow{}).Where("id = ?", params).Updates((map[string]interface{}{"description": editcashflow.Description, "amount": editcashflow.Amount, "balance_history": balancehistory, "updated_at": time.Now()})).Error
 
 	return err
 }

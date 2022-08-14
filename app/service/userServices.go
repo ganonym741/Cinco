@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+
 	"strings"
 	"time"
 
@@ -105,7 +106,8 @@ func (u UserService) UserLogout(ctx *fiber.Ctx, params string) (*response.Logout
 		return nil, err
 	}
 
-	claim["exp"] = time.Now().Add(-time.Hour)
+	claim["exp"] = -1
+
 	return &response.LogoutResponse{
 		Status:   "success",
 		Messages: "logout",

@@ -57,6 +57,7 @@ func (s Service) AddTransaction(ctx *fiber.Ctx, body model.Cashflow) error {
 func (s Service) FindTransactionLog(userUUID string, tipe string, startDate int64, endDate int64) []model.Cashflow {
 	return s.cashflowRepository.FindByAccount(userUUID, tipe, time.Unix(startDate, 0), time.Unix(endDate, 0))
 }
+
 func (s Service) DeleteCashflow(ctx *fiber.Ctx, cashflowid string, paramsIdAccount string) (*model.Cashflow, error) {
 	var data model.Cashflow
 	fmt.Println("get", cashflowid, paramsIdAccount)
@@ -100,7 +101,7 @@ func (s Service) DeleteCashflow(ctx *fiber.Ctx, cashflowid string, paramsIdAccou
 	return &data, nil
 }
 
-func (s Service) EditCashflow(ctx *fiber.Ctx, body *model.Cashflow, reqUpdate *model.Account, params, paramsIdAccount string) (*model.Cashflow, error) {
+func (s Service) EditCashflow(ctx *fiber.Ctx, body *model.Cashflow, reqUpdate *model.Account, params, paramsIdAccount string) (*model.ResoponseCashflow, error) {
 
 	data := model.Cashflow{
 		Description: body.Description,
@@ -154,7 +155,11 @@ func (s Service) EditCashflow(ctx *fiber.Ctx, body *model.Cashflow, reqUpdate *m
 
 	fmt.Println(balance)
 
-	return &data, nil
+	return &model.ResoponseCashflow{
+		Description:    body.Description,
+		Amount:         body.Amount,
+		BalanceHistory: balance,
+	}, nil
 }
 
 func NewCashflowService(repository interfaces.CashflowRepositoryInterface, accountRepository interfaces.AccountRepositoryInterface) serviceInterface.CashflowServiceInterface {
