@@ -15,3 +15,9 @@ type Cashflow struct {
 	CreatedAt      time.Time  `json:"created_at,omitempty"`
 	UpdatedAt      *time.Time `json:"updated_at,omitempty"`
 }
+
+type ResoponseCashflow struct {
+	Description    string `json:"description,omitempty"`
+	Amount         int    `json:"amount,omitempty"`
+	BalanceHistory int    `json:"balance_history,omitempty"`
+}
