@@ -2,6 +2,7 @@ package repository
 
 import (
 	"fmt"
+	utilities "gitlab.com/cinco/utils"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -10,27 +11,30 @@ import (
 	"gorm.io/gorm"
 )
 
-func (r Repository) FindByAccount(userUUID string, tipe string, startDate time.Time, endDate time.Time) []model.Cashflow {
-	format := "2006-01-02 15:04:05"
-
+func (r Repository) FindByAccount(userUUID string, tipe string, startDate time.Time, endDate time.Time) ([]model.Cashflow, error) {
 	var query = "SELECT c.id, c.type, c.amount, c.balance_history, c.description " +
 		"FROM cashflows c " +
-		"INNER JOIN accounts a ON c.account_id  = a.id " +
-		"INNER JOIN users u ON a.user_id = u.id " +
-		"WHERE u.id = '" + userUUID + "' "
+		"INNER JOIN accounts a ON c.account_id  = a.id INNER JOIN users u ON a.user_id = u.id " +
+		"WHERE u.id = '" + userUUID + "'"
 
 	if len(tipe) > 0 && tipe != "" {
 		query += " AND c.type = '" + tipe + "' "
 	}
 
 	if !startDate.IsZero() && !endDate.IsZero() {
-		query += " AND c.created_at BETWEEN '" + Bod(startDate).Format(format) + "' AND '" + Eod(endDate).Format(format) + "'"
+		query += " AND c.created_at BETWEEN '" + startDate.Format(utilities.DateTimeFormat) + "' AND '" + endDate.Format(utilities.DateTimeFormat) + "'"
 	}
 
-	var cashflows []model.Cashflow
-	r.Db.Raw(query).Scan(&cashflows)
+	//fmt.Println(query)
 
-	return cashflows
+	var cashflows []model.Cashflow
+
+	err := r.Db.Raw(query).Scan(&cashflows).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return cashflows, nil
 }
 
 func (r Repository) PostTransaction(ctx *fiber.Ctx, body *model.Cashflow) error {
@@ -74,16 +78,6 @@ func (r Repository) GetHistoryandAmountBefore(ctx *fiber.Ctx, params string) (in
 	fmt.Println("result2", Result)
 
 	return Result.Amount, Result.Type, Result.BalanceHistory, nil
-}
-
-func Bod(t time.Time) time.Time {
-	year, month, day := t.Date()
-	return time.Date(year, month, day, 0, 0, 0, 0, t.Location())
-}
-
-func Eod(t time.Time) time.Time {
-	year, month, day := t.Date()
-	return time.Date(year, month, day, 23, 59, 59, 0, t.Location())
 }
 
 func NewCashflowRepository(db *gorm.DB) interfaces.CashflowRepositoryInterface {

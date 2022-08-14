@@ -47,6 +47,7 @@ func (u UserService) UserRegister(ctx *fiber.Ctx, params *param.User) (*model.Us
 		BirthDate:  date,
 		Domicile:   params.Domicile,
 		Occupation: params.Occupation,
+		CreatedAt:  time.Now(),
 	}
 
 	err := u.userRepository.UserRegister(ctx, createdRegister)

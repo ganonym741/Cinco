@@ -1,7 +1,8 @@
 package handler
 
 import (
-	"strconv"
+	utilities "gitlab.com/cinco/utils"
+	"time"
 
 	"gitlab.com/cinco/app/model"
 	"gitlab.com/cinco/app/service/interfaces"
@@ -42,19 +43,29 @@ func (h Handler) DoTransaction(ctx *fiber.Ctx) error {
 }
 
 func (h Handler) CashflowHistory(ctx *fiber.Ctx) error {
-	startDate, _ := strconv.ParseInt(ctx.Query("startdate"), 10, 64)
-	endDate, _ := strconv.ParseInt(ctx.Query("enddate"), 10, 64)
+	startDate, err := time.Parse(utilities.LayoutFormat, ctx.Query("startdate"))
+	if err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"status": "bad request", "message": "invalid date format", "data": []string{}})
+	}
+	endDate, err := time.Parse(utilities.LayoutFormat, ctx.Query("enddate"))
+	if err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"status": "bad request", "message": "invalid date format", "data": []string{}})
+	}
 	uuid := ctx.Query("uuid")
 	tipe := ctx.Query("type")
 
-	if len(uuid) <= 0 || startDate <= 0 || endDate <= 0 {
-		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"status": "bad request", "message": "bad request", "data": []string{}})
+	if len(uuid) <= 0 || startDate.IsZero() || endDate.IsZero() {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"status": "bad request", "message": "bad request data", "data": []string{}})
 	}
 
-	cashflows := h.cashflowService.FindTransactionLog(uuid, tipe, startDate, endDate)
+	cashflows, err := h.cashflowService.FindTransactionLog(uuid, tipe, startDate, endDate)
+
+	if err != nil {
+		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"status": "internal server error", "message": "error", "data": []string{}})
+	}
 
 	if len(cashflows) <= 0 {
-		return ctx.Status(fiber.StatusNoContent).JSON(fiber.Map{"status": "data not found", "message": "no record found", "data": []string{}})
+		return ctx.Status(fiber.StatusOK).JSON(fiber.Map{"status": "success", "message": "no record found", "data": []string{}})
 	}
 
 	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{"status": "success", "message": "success", "data": cashflows})
