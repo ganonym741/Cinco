@@ -25,7 +25,6 @@ func (h UserHandler) UserRegister(ctx *fiber.Ctx) error {
 	var params *param.User
 	err := ctx.BodyParser(&params)
 	if err != nil {
-		fmt.Println("error1")
 		return ctx.Status(400).
 			JSON(fiber.Map{
 				"status":   "failed",
@@ -41,7 +40,6 @@ func (h UserHandler) UserRegister(ctx *fiber.Ctx) error {
 
 	data, err := h.UserService.UserRegister(ctx, params)
 	if err != nil {
-		fmt.Println("error2")
 		return ctx.Status(500).
 			JSON(fiber.Map{
 				"status": "failed",
