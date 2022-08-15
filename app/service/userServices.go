@@ -30,9 +30,15 @@ func (u UserService) FindByID(userUUID string) model.User {
 	return u.userRepository.FindById(userUUID)
 }
 
-func (u UserService) UserRegister(ctx *fiber.Ctx, params *param.User) (*model.User, error) {
+func (u UserService) UserRegister(ctx *fiber.Ctx, params *param.User) (*response.User, error) {
 	params.Id = uuid.New().String()
 	params.Password, _ = utilities.GeneratePassword(params.Password)
+
+	dataUser, _ := u.userRepository.CheckUser(ctx, params.Username, params.Email)
+	if dataUser.Username == params.Username || dataUser.Email == params.Email {
+		return nil, errors.New("exist")
+	}
+
 	activationLink := "Hallo," + params.Fullname + ", please actvate your account " +
 		"<a href= \"http://" + configs.Config().Host + "/api/user/activation/" + params.Id + "\">here!</a>"
 
@@ -55,12 +61,24 @@ func (u UserService) UserRegister(ctx *fiber.Ctx, params *param.User) (*model.Us
 		return nil, err
 	}
 
-	err = utilities.SendMail(params.Email, activationLink)
-	if err != nil {
-		return nil, err
-	}
+	go func() error {
+		err = utilities.SendMail(params.Email, activationLink)
+		if err != nil {
+			return err
+		}
+		return nil
+	}()
 
-	return &createdRegister, nil
+	return &response.User{
+		Id:         params.Id,
+		Username:   params.Username,
+		Fullname:   params.Fullname,
+		Email:      params.Email,
+		BirthDate:  date,
+		Domicile:   params.Domicile,
+		Occupation: params.Occupation,
+		CreatedAt:  time.Now(),
+	}, nil
 }
 
 func (u UserService) GetUserDetail(ctx *fiber.Ctx, userid string) (*response.ProfileDetail, error) {
