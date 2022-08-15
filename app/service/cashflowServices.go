@@ -67,9 +67,6 @@ func (s Service) EditCashflow(ctx *fiber.Ctx, body *model.Cashflow, reqUpdate *m
 		Description: body.Description,
 		Amount:      body.Amount,
 	}
-
-	// 	fmt.Println("ini data input", data.Amount)
-
 	amountnhistory, amounttypes, _, err := s.cashflowRepository.GetHistoryandAmountBefore(ctx, params)
 	if err != nil {
 		return nil, err
@@ -79,7 +76,6 @@ func (s Service) EditCashflow(ctx *fiber.Ctx, body *model.Cashflow, reqUpdate *m
 	if err != nil {
 		return nil, err
 	}
-
 	switch amounttypes {
 	case "credit":
 		if data.Amount > amountnhistory {

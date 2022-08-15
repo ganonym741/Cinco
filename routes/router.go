@@ -39,5 +39,5 @@ func AllRouter(app *fiber.App, db *gorm.DB) {
 	api.Get("/cash", utilities.Authorization(true), cashflowHandler.CashflowHistory)
 	api.Post("/cash", utilities.Authorization(true), cashflowHandler.DoTransaction)
 	api.Put("/cash/:cashflowId/:accountId", utilities.Authorization(true), cashflowHandler.CashflowEdit)
-	api.Delete("/cash/:cashflowId/:accountId", utilities.Authorization(true), cashflowHandler.CashflowDelete)
+	// api.Delete("/cash/:cashflowId/:accountId", utilities.Authorization(true), cashflowHandler.CashflowDelete)
 }

@@ -18,7 +18,7 @@ type Handler struct {
 type CincoCashflow interface {
 	DoTransaction(ctx *fiber.Ctx) error
 	CashflowEdit(c *fiber.Ctx) error
-	CashflowDelete(c *fiber.Ctx) error
+	// CashflowDelete(c *fiber.Ctx) error
 	CashflowHistory(c *fiber.Ctx) error
 }
 
