@@ -18,7 +18,7 @@ type Handler struct {
 type CincoCashflow interface {
 	DoTransaction(ctx *fiber.Ctx) error
 	CashflowEdit(c *fiber.Ctx) error
-	// CashflowDelete(c *fiber.Ctx) error
+	CashflowDelete(c *fiber.Ctx) error
 	CashflowHistory(c *fiber.Ctx) error
 }
 
@@ -102,7 +102,7 @@ func (h Handler) CashflowDelete(ctx *fiber.Ctx) error {
 			JSON(fiber.Map{"status": "Failed", "message": "Data not found", "data": nil})
 	}
 	return ctx.Status(201).
-		JSON(fiber.Map{"status": "Success", "message": "User data retrieved"})
+		JSON(fiber.Map{"status": "Success", "message": "Cashflow deleted"})
 }
 
 func NewCashflowHandler(service interfaces.CashflowServiceInterface) CincoCashflow {

@@ -122,13 +122,17 @@ func (s Service) DeleteCashflow(ctx *fiber.Ctx, cashflowid string, paramsIdAccou
 	if cashflowTypes == "credit" {
 		amountHistory = -amountHistory
 	} else if cashflowTypes == "debet" {
-		goto outside_if
+
 	} else {
 		return errors.New("tipe transaksi tidak bisa terbaca")
 	}
-outside_if:
 
 	err = s.cashflowRepository.RepoUpdateBalance2(ctx, amountHistory, paramsIdAccount)
+	if err != nil {
+		return err
+	}
+
+	err = s.cashflowRepository.DeleteCashflow(ctx, cashflowid)
 	if err != nil {
 		return err
 	}

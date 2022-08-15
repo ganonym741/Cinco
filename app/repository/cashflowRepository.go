@@ -46,7 +46,7 @@ func (r Repository) PostTransaction(ctx *fiber.Ctx, body *model.Cashflow) error 
 	return err
 }
 
-func (r Repository) DeleteCashflow(ctx *fiber.Ctx, deleteCashFlow *model.Cashflow, params string) error {
+func (r Repository) DeleteCashflow(ctx *fiber.Ctx, params string) error {
 
 	err := r.Db.Raw("DELETE FROM public.cashflows WHERE id = ?", params).Error
 
@@ -69,7 +69,7 @@ func (r Repository) RepoUpdateBalance(ctx *fiber.Ctx, updatebalance int, paramsI
 
 func (r Repository) RepoUpdateBalance2(ctx *fiber.Ctx, amountAffected int, paramsIdAccount string) error {
 
-	err := r.Db.Raw("UPDATE public.accounts SET balance = balance + ?", amountAffected).Error
+	err := r.Db.Raw("UPDATE public.accounts SET balance = balance + ? WHERE id = ?", amountAffected, paramsIdAccount).Error
 
 	return err
 }
