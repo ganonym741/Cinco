@@ -40,8 +40,8 @@ func (h UserHandler) UserRegister(ctx *fiber.Ctx) error {
 		if err.Error() == "exist" {
 			return ctx.Status(500).
 				JSON(fiber.Map{
-					"status": "failed",
-					"data":   "exist",
+					"status":  "failed",
+					"message": "your username or email already exist",
 				})
 		}
 
