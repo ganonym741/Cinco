@@ -12,4 +12,5 @@ type UserRepositoryInterface interface {
 	UserRegister(ctx *fiber.Ctx, params model.User) error
 	GetUserByIdentity(ctx *fiber.Ctx, params string) (*model.User, error)
 	GetUserDetail(ctx *fiber.Ctx, user *response.ProfileDetail, params string) error
+	CheckUser(ctx *fiber.Ctx, paramsUsername, paramsEmail string) (*model.User, error)
 }

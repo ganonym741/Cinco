@@ -41,6 +41,12 @@ func (u UserRepository) GetUserDetail(ctx *fiber.Ctx, user *response.ProfileDeta
 	return err
 }
 
+func (u UserRepository) CheckUser(ctx *fiber.Ctx, paramsUsername, paramsEmail string) (*model.User, error) {
+	var user *model.User
+	err := u.Db.Where("username = ? or email =?", paramsUsername, paramsEmail).Find(&user).Error
+	return user, err
+}
+
 func NewUserRepository(db *gorm.DB) interfaces.UserRepositoryInterface {
 	return &UserRepository{
 		Db: db,
