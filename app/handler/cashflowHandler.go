@@ -96,7 +96,7 @@ func (h Handler) CashflowDelete(ctx *fiber.Ctx) error {
 	params := ctx.Params("cashflowId")
 	paramsIdAccount := ctx.Params("accountId")
 
-	_, err := h.cashflowService.DeleteCashflow(ctx, params, paramsIdAccount)
+	err := h.cashflowService.DeleteCashflow(ctx, params, paramsIdAccount)
 	if err != nil {
 		return ctx.Status(404).
 			JSON(fiber.Map{"status": "Failed", "message": "Data not found", "data": nil})

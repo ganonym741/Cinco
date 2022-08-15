@@ -13,5 +13,6 @@ type CashflowRepositoryInterface interface {
 	DeleteCashflow(ctx *fiber.Ctx, deleteCashFlow *model.Cashflow, params string) error
 	RepoEditCashFlow(ctx *fiber.Ctx, editcashflow *model.Cashflow, params string, balancehistory int) error
 	RepoUpdateBalance(ctx *fiber.Ctx, req *model.Account, paramsIdAccount string) error
+	RepoUpdateBalance2(ctx *fiber.Ctx, amountAffected int, paramsIdAccount string) error
 	GetHistoryandAmountBefore(ctx *fiber.Ctx, params string) (int, string, int, error)
 }
