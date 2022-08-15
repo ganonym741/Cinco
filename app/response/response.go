@@ -2,14 +2,25 @@ package response
 
 import (
 	"time"
-
-	"gitlab.com/cinco/app/model"
 )
 
 type (
+	User struct {
+		Id         string     `gorm:"type:uuid;primary_key" json:"id,omitempty"`
+		Username   string     `json:"username,omitempty"`
+		Fullname   string     `json:"fullname,omitempty"`
+		Email      string     `json:"email,omitempty"`
+		BirthDate  time.Time  `json:"birthdate,omitempty"`
+		Domicile   string     `json:"domicile,omitempty"`
+		Occupation string     `json:"occupation,omitempty"`
+		Status     bool       `json:"status,omitempty"`
+		CreatedAt  time.Time  `json:"created_at,omitempty"`
+		UpdatedAt  *time.Time `json:"updated_at,omitempty"`
+	}
+
 	RegisterResponse struct {
-		Messages string     `json:"message"`
-		Data     model.User `json:"data"`
+		Messages string `json:"message"`
+		Data     User   `json:"data"`
 	}
 
 	LoginResponse struct {
