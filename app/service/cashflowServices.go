@@ -1,7 +1,6 @@
 package service
 
 import (
-	"errors"
 	"fmt"
 	"time"
 
@@ -126,22 +125,22 @@ func (s Service) EditCashflow(ctx *fiber.Ctx, body *model.Cashflow, reqUpdate *m
 
 func (s Service) DeleteCashflow(ctx *fiber.Ctx, cashflowid string, paramsIdAccount string) error {
 	amountHistory, type, _, err := s.cashflowRepository.GetHistoryandAmountBefore(ctx, cashflowid)
-	if err != nil {
-		return err
-	}
+	// if err != nil {
+	// 	return err
+	// }
 
-	if type == "credit" {
-		amountHistory = -amountHistory
-	} else if type == "debet" {
+	// if type == "credit" {
+	// 	amountHistory = -amountHistory
+	// } else if type == "debet" {
 
-	} else {
-		return errors.New("Tipe transaksi tidak bisa terbaca!")
-	}
+	// } else {
+	// 	return errors.New("Tipe transaksi tidak bisa terbaca!")
+	// }
 
-	err = s.cashflowRepository.RepoUpdateBalance2(ctx, amountHistory, paramsIdAccount)
-	if err != nil {
-		return err
-	}
+	// err = s.cashflowRepository.RepoUpdateBalance2(ctx, amountHistory, paramsIdAccount)
+	// if err != nil {
+	// 	return err
+	// }
 
 	return nil
 }
