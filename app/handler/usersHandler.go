@@ -36,11 +36,18 @@ func (h UserHandler) UserRegister(ctx *fiber.Ctx) error {
 	errors := utilities.ValidateStruct(*params)
 	if errors != nil {
 		return ctx.Status(fiber.StatusBadRequest).JSON(errors)
-
 	}
 
 	data, err := h.UserService.UserRegister(ctx, params)
 	if err != nil {
+		if err.Error() == "exist" {
+			return ctx.Status(500).
+				JSON(fiber.Map{
+					"status": "failed",
+					"data":   "exist",
+				})
+		}
+
 		fmt.Println("error2")
 		return ctx.Status(500).
 			JSON(fiber.Map{

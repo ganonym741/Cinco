@@ -5,7 +5,7 @@ import _ "github.com/go-playground/validator/v10"
 type (
 	User struct {
 		Id         string `gorm:"type:uuid;primary_key" json:"id"`
-		Username   string `json:"username" validate:"required,min=5,alpha"`
+		Username   string `json:"username" validate:"required,min=5,alphanumunicode"`
 		Fullname   string `json:"fullname" validate:"required"`
 		Password   string `json:"password" validate:"required,min=5"`
 		Email      string `json:"email" validate:"required,email"`
@@ -15,7 +15,7 @@ type (
 	}
 
 	Login struct {
-		Identity string `json:"identity"`
+		Identity string `json:"username"`
 		Password string `json:"password"`
 	}
 )
