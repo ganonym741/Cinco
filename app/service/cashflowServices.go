@@ -131,6 +131,11 @@ func (s Service) DeleteCashflow(ctx *fiber.Ctx, cashflowid string, paramsIdAccou
 		return err
 	}
 
+	err = s.cashflowRepository.DeleteCashflow(ctx, cashflowid)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
