@@ -76,6 +76,7 @@ func (s Service) EditCashflow(ctx *fiber.Ctx, body *model.Cashflow, reqUpdate *m
 	if err != nil {
 		return nil, err
 	}
+
 	switch amounttypes {
 	case "credit":
 		if data.Amount > amountnhistory {
@@ -87,9 +88,10 @@ func (s Service) EditCashflow(ctx *fiber.Ctx, body *model.Cashflow, reqUpdate *m
 		if data.Amount > amountnhistory {
 			balance = balance + (data.Amount - amountnhistory)
 		} else {
-			balance = balance - (data.Amount - amountnhistory)
+			balance = balance - (amountnhistory - data.Amount)
 		}
 	}
+
 	err = s.cashflowRepository.RepoUpdateBalance(ctx, balance, paramsIdAccount)
 	if err != nil {
 		return nil, err
