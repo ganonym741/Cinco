@@ -12,6 +12,7 @@ type CashflowRepositoryInterface interface {
 	FindByAccount(userUUID string, tipe string, startDate time.Time, endDate time.Time) ([]model.Cashflow, error)
 	DeleteCashflow(ctx *fiber.Ctx, deleteCashFlow *model.Cashflow, params string) error
 	RepoEditCashFlow(ctx *fiber.Ctx, editcashflow *model.Cashflow, params string) error
-	RepoUpdateBalance(ctx *fiber.Ctx,updatebalance int, paramsIdAccount string) error
+	RepoUpdateBalance(ctx *fiber.Ctx, updatebalance int, paramsIdAccount string) error
+	RepoUpdateBalance2(ctx *fiber.Ctx, amountAffected int, paramsIdAccount string) error
 	GetHistoryandAmountBefore(ctx *fiber.Ctx, params string) (int, string, int, error)
 }

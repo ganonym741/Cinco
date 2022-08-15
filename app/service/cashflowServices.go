@@ -1,6 +1,7 @@
 package service
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
@@ -60,116 +61,15 @@ func (s Service) FindTransactionLog(userUUID string, tipe string, startDate time
 	return s.cashflowRepository.FindByAccount(userUUID, tipe, utilities.Bod(startDate), utilities.Eod(endDate))
 }
 
-// func (s Service) DeleteCashflow(ctx *fiber.Ctx, cashflowid string, paramsIdAccount string) (*model.Cashflow, error) {
-// 	var data model.Cashflow
-// 	fmt.Println("get", cashflowid, paramsIdAccount)
-
-// 	amounthistory, amounttypes, balancehistory, err := s.cashflowRepository.GetHistoryandAmountBefore(ctx, cashflowid)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	balance, err := s.account.GetBalance(ctx, paramsIdAccount)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	accountUpdate := model.Account{}
-
-// 	switch amounttypes {
-// 	case "credit":
-// 		balance = balance + amounthistory
-// 	case "debet":
-// 		balance = balance + amounthistory
-// 	}
-
-// 	data.BalanceHistory = balance
-// 	accountUpdate.Balance = balance
-// 	balancehistory = balance
-
-// 	err = s.cashflowRepository.RepoUpdateBalance(ctx, &accountUpdate, paramsIdAccount)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	err = s.cashflowRepository.RepoEditCashFlow(ctx, &data, cashflowid, balancehistory)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	err = s.cashflowRepository.DeleteCashflow(ctx, &data, cashflowid)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	return &data, nil
-// }
-
-// func (s Service) EditCashflow(ctx *fiber.Ctx, body *model.Cashflow, reqUpdate *model.Account, params, paramsIdAccount string) (*model.ResoponseCashflow, error) {
-
-// 	data := model.Cashflow{
-// 		Description: body.Description,
-// 		Amount:      body.Amount,
-// 	}
-
-// 	fmt.Println("ini data input", data.Amount)
-
-// 	amountnhistory, amounttypes, balancehistory, err := s.cashflowRepository.GetHistoryandAmountBefore(ctx, params)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	balance, err := s.account.GetBalance(ctx, paramsIdAccount)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	accountUpdate := model.Account{}
-
-// 	switch amounttypes {
-// 	case "credit":
-// 		if balance > data.Amount {
-// 			if data.Amount > amountnhistory {
-// 				balance = balance - (data.Amount - amountnhistory)
-// 			} else {
-// 				balance = balance + (amountnhistory - data.Amount)
-// 			}
-// 		} else {
-// 			fmt.Println("Saldo tidak mencukupi")
-// 		}
-// 	case "debet":
-// 		if data.Amount > amountnhistory {
-// 			balance = balance + (data.Amount - amountnhistory)
-// 		} else {
-// 			balance = balance - (amountnhistory - data.Amount)
-// 		}
-// 	}
-
-// 	data.BalanceHistory = balance
-// 	accountUpdate.Balance = balance
-// 	balancehistory = balance
-// 	err = s.cashflowRepository.RepoUpdateBalance(ctx, &accountUpdate, paramsIdAccount)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	err = s.cashflowRepository.RepoEditCashFlow(ctx, &data, params, balancehistory)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	fmt.Println(balance)
-
-// 	return &model.ResoponseCashflow{
-// 		Description:    body.Description,
-// 		Amount:         body.Amount,
-// 		BalanceHistory: balance,
-// 	}, nil
-// }
-
 func (s Service) EditCashflow(ctx *fiber.Ctx, body *model.Cashflow, reqUpdate *model.Account, params, paramsIdAccount string) (*model.ResoponseCashflow, error) {
 
 	data := model.Cashflow{
 		Description: body.Description,
 		Amount:      body.Amount,
 	}
+
+	fmt.Println("ini data input", data.Amount)
+
 	amountnhistory, amounttypes, _, err := s.cashflowRepository.GetHistoryandAmountBefore(ctx, params)
 	if err != nil {
 		return nil, err
@@ -179,6 +79,7 @@ func (s Service) EditCashflow(ctx *fiber.Ctx, body *model.Cashflow, reqUpdate *m
 	if err != nil {
 		return nil, err
 	}
+
 	switch amounttypes {
 	case "credit":
 		if data.Amount > amountnhistory {
@@ -190,9 +91,10 @@ func (s Service) EditCashflow(ctx *fiber.Ctx, body *model.Cashflow, reqUpdate *m
 		if data.Amount > amountnhistory {
 			balance = balance + (data.Amount - amountnhistory)
 		} else {
-			balance = balance - (data.Amount - amountnhistory)
+			balance = balance - (amountnhistory - data.Amount)
 		}
 	}
+
 	err = s.cashflowRepository.RepoUpdateBalance(ctx, balance, paramsIdAccount)
 	if err != nil {
 		return nil, err
@@ -201,11 +103,37 @@ func (s Service) EditCashflow(ctx *fiber.Ctx, body *model.Cashflow, reqUpdate *m
 	if err != nil {
 		return nil, err
 	}
+
+	fmt.Println(balance)
+
 	return &model.ResoponseCashflow{
 		Description:    body.Description,
 		Amount:         body.Amount,
 		BalanceHistory: balance,
 	}, nil
+}
+
+func (s Service) DeleteCashflow(ctx *fiber.Ctx, cashflowid string, paramsIdAccount string) error {
+	amountHistory, cashflowTypes, _, err := s.cashflowRepository.GetHistoryandAmountBefore(ctx, cashflowid)
+	if err != nil {
+		return err
+	}
+
+	if cashflowTypes == "credit" {
+		amountHistory = -amountHistory
+	} else if cashflowTypes == "debet" {
+		goto outside_if
+	} else {
+		return errors.New("tipe transaksi tidak bisa terbaca")
+	}
+outside_if:
+
+	err = s.cashflowRepository.RepoUpdateBalance2(ctx, amountHistory, paramsIdAccount)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func NewCashflowService(repository interfaces.CashflowRepositoryInterface, accountRepository interfaces.AccountRepositoryInterface) serviceInterface.CashflowServiceInterface {

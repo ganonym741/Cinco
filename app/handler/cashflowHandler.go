@@ -92,18 +92,18 @@ func (h Handler) CashflowEdit(ctx *fiber.Ctx) error {
 		JSON(fiber.Map{"status": "Success", "message": "User data retrieved", "data": data})
 }
 
-// func (h Handler) CashflowDelete(ctx *fiber.Ctx) error {
-// 	params := ctx.Params("cashflowId")
-// 	paramsIdAccount := ctx.Params("accountId")
+func (h Handler) CashflowDelete(ctx *fiber.Ctx) error {
+	params := ctx.Params("cashflowId")
+	paramsIdAccount := ctx.Params("accountId")
 
-// 	_, err := h.cashflowService.DeleteCashflow(ctx, params, paramsIdAccount)
-// 	if err != nil {
-// 		return ctx.Status(404).
-// 			JSON(fiber.Map{"status": "Failed", "message": "Data not found", "data": nil})
-// 	}
-// 	return ctx.Status(201).
-// 		JSON(fiber.Map{"status": "Success", "message": "User data retrieved"})
-// }
+	err := h.cashflowService.DeleteCashflow(ctx, params, paramsIdAccount)
+	if err != nil {
+		return ctx.Status(404).
+			JSON(fiber.Map{"status": "Failed", "message": "Data not found", "data": nil})
+	}
+	return ctx.Status(201).
+		JSON(fiber.Map{"status": "Success", "message": "User data retrieved"})
+}
 
 func NewCashflowHandler(service interfaces.CashflowServiceInterface) CincoCashflow {
 	return &Handler{
