@@ -23,7 +23,7 @@ func (r Repository) FindByAccount(userUUID string, tipe string, startDate time.T
 	}
 
 	if !startDate.IsZero() && !endDate.IsZero() {
-		query += " AND c.created_at BETWEEN '" + startDate.Format(utilities.DateTimeFormat) + "' AND '" + endDate.Format(utilities.DateTimeFormat) + "'"
+		query += " AND c.issued_at BETWEEN '" + startDate.Format(utilities.DateTimeFormat) + "' AND '" + endDate.Format(utilities.DateTimeFormat) + "'"
 	}
 
 	query += " ORDER BY c.issued_at"

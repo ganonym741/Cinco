@@ -21,3 +21,8 @@ type ResoponseCashflow struct {
 	Amount         int    `json:"amount,omitempty"`
 	BalanceHistory int    `json:"balance_history,omitempty"`
 }
+
+type Total struct {
+	Debet  int `json:"debet,omitempty"`
+	Credit int `json:"credit,omitempty"`
+}

@@ -19,6 +19,10 @@ type Service struct {
 	account            interfaces.AccountRepositoryInterface
 }
 
+func (s Service) TotalCashflow(userUUID string, startDate time.Time, endDate time.Time) (model.Total, error) {
+	return s.cashflowRepository.FindTotal(userUUID, utilities.Bod(startDate), utilities.Eod(endDate))
+}
+
 func (s Service) AddTransaction(ctx *fiber.Ctx, body model.Cashflow) error {
 	body.Id = uuid.NewString()
 

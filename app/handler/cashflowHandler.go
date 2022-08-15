@@ -46,30 +46,59 @@ func (h Handler) DoTransaction(ctx *fiber.Ctx) error {
 func (h Handler) CashflowHistory(ctx *fiber.Ctx) error {
 	startDate, err := time.Parse(utilities.LayoutFormat, ctx.Query("startdate"))
 	if err != nil {
-		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"status": "bad request", "message": "invalid date format", "data": []string{}})
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"status": "bad request", "message": "invalid date format", "data": []string{},
+			"total_debet":  0,
+			"total_credit": 0})
 	}
 	endDate, err := time.Parse(utilities.LayoutFormat, ctx.Query("enddate"))
 	if err != nil {
-		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"status": "bad request", "message": "invalid date format", "data": []string{}})
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"status": "bad request", "message": "invalid date format", "data": []string{},
+			"total_debet":  0,
+			"total_credit": 0})
 	}
 	uuid := ctx.Query("uuid")
 	tipe := ctx.Query("type")
 
 	if len(uuid) <= 0 || startDate.IsZero() || endDate.IsZero() {
-		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{"status": "bad request", "message": "bad request data", "data": []string{}})
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":       "bad request",
+			"message":      "bad request data",
+			"data":         []string{},
+			"total_debet":  0,
+			"total_credit": 0})
 	}
 
 	cashflows, err := h.cashflowService.FindTransactionLog(uuid, tipe, startDate, endDate)
 
 	if err != nil {
-		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"status": "internal server error", "message": "error", "data": []string{}})
+		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"status":       "internal server error",
+			"message":      "error processing data",
+			"data":         []string{},
+			"total_debet":  0,
+			"total_credit": 0})
 	}
 
 	if len(cashflows) <= 0 {
-		return ctx.Status(fiber.StatusOK).JSON(fiber.Map{"status": "success", "message": "no record found", "data": []string{}})
+		return ctx.Status(fiber.StatusOK).JSON(fiber.Map{"status": "success", "message": "no record found", "data": []string{},
+			"total_debet":  0,
+			"total_credit": 0})
 	}
 
-	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{"status": "success", "message": "success", "data": cashflows})
+	total, err := h.cashflowService.TotalCashflow(uuid, startDate, endDate)
+
+	if err != nil {
+		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"status":       "internal server error",
+			"message":      "error counting total",
+			"data":         cashflows,
+			"total_debet":  0,
+			"total_credit": 0})
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{"status": "success", "message": "success", "data": cashflows,
+		"total_debet":  total.Debet,
+		"total_credit": total.Credit})
 }
 
 func (h Handler) CashflowEdit(ctx *fiber.Ctx) error {
