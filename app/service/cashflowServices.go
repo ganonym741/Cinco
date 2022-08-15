@@ -2,7 +2,6 @@ package service
 
 import (
 	"errors"
-	"fmt"
 	"time"
 
 	utilities "gitlab.com/cinco/utils"
@@ -11,6 +10,7 @@ import (
 	"github.com/google/uuid"
 	"gitlab.com/cinco/app/model"
 	"gitlab.com/cinco/app/repository/interfaces"
+	"gitlab.com/cinco/app/response"
 	serviceInterface "gitlab.com/cinco/app/service/interfaces"
 )
 
@@ -31,31 +31,23 @@ func (s Service) AddTransaction(ctx *fiber.Ctx, body model.Cashflow) error {
 		return err
 	}
 
-	fmt.Println("cek staus bod")
-
 	if body.Type == "debet" {
 		balance = balance + body.Amount
 	} else if body.Type == "credit" {
 		if balance > body.Amount {
 			balance = balance - body.Amount
 		} else {
-			return nil // saldo tidak mencukupi
+			return errors.New("saldo tidak mencukupi")
 		}
-	} else {
-		return nil // tipe transaksi anda tidak valid
 	}
-
-	body.BalanceHistory = balance
 
 	err = s.account.UpdateBalance(ctx, body.AccountId, balance)
 	if err != nil {
-		fmt.Println("cek staus bod 4")
 		return err
 	}
 
 	err = s.cashflowRepository.PostTransaction(ctx, &body)
 	if err != nil {
-		fmt.Println("cek staus bod 5")
 		return err
 	}
 	return nil
@@ -65,13 +57,14 @@ func (s Service) FindTransactionLog(userUUID string, tipe string, startDate time
 	return s.cashflowRepository.FindByAccount(userUUID, tipe, utilities.Bod(startDate), utilities.Eod(endDate))
 }
 
-func (s Service) EditCashflow(ctx *fiber.Ctx, body *model.Cashflow, reqUpdate *model.Account, params, paramsIdAccount string) (*model.ResoponseCashflow, error) {
+func (s Service) EditCashflow(ctx *fiber.Ctx, body *model.Cashflow, reqUpdate *model.Account, params, paramsIdAccount string) (*response.ResponseCashflow, error) {
 
 	data := model.Cashflow{
 		Description: body.Description,
 		Amount:      body.Amount,
 	}
-	amountnhistory, amounttypes, _, err := s.cashflowRepository.GetHistoryandAmountBefore(ctx, params)
+
+	amountnhistory, amounttypes, err := s.cashflowRepository.GetHistoryandAmountBefore(ctx, params)
 	if err != nil {
 		return nil, err
 	}
@@ -104,33 +97,33 @@ func (s Service) EditCashflow(ctx *fiber.Ctx, body *model.Cashflow, reqUpdate *m
 	if err != nil {
 		return nil, err
 	}
-	return &model.ResoponseCashflow{
-		Description:    body.Description,
-		Amount:         body.Amount,
-		BalanceHistory: balance,
+
+	return &response.ResponseCashflow{
+		Description: body.Description,
+		Amount:      body.Amount,
 	}, nil
 }
 
 func (s Service) DeleteCashflow(ctx *fiber.Ctx, cashflowid string, paramsIdAccount string) error {
-	amountHistory, cashflowTypes, _, err := s.cashflowRepository.GetHistoryandAmountBefore(ctx, cashflowid)
+	amountHistory, cashflowTypes, err := s.cashflowRepository.GetHistoryandAmountBefore(ctx, cashflowid)
+	if err != nil {
+		return err
+	}
+
+	balance, err := s.account.GetBalance(ctx, paramsIdAccount)
 	if err != nil {
 		return err
 	}
 
 	if cashflowTypes == "credit" {
-		amountHistory = -amountHistory
+		balance = balance + amountHistory
 	} else if cashflowTypes == "debet" {
-
+		balance = balance - amountHistory
 	} else {
 		return errors.New("tipe transaksi tidak bisa terbaca")
 	}
 
-	err = s.cashflowRepository.RepoUpdateBalance(ctx, amountHistory, paramsIdAccount)
-	if err != nil {
-		return err
-	}
-
-	err = s.cashflowRepository.DeleteCashflow(ctx, cashflowid)
+	err = s.cashflowRepository.RepoUpdateBalance(ctx, balance, paramsIdAccount)
 	if err != nil {
 		return err
 	}

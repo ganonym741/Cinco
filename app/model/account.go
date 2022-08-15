@@ -10,4 +10,5 @@ type Account struct {
 	Balance   int        `json:"balance,omitempty"`
 	CreatedAt time.Time  `json:"created_at,omitempty"`
 	UpdatedAt *time.Time `json:"updated_at,omitempty"`
+	DeletedAt DeletedAt  `gorm:"index" json:"deleted_at,omitempty"`
 }
