@@ -27,20 +27,20 @@ func (h Handler) DoTransaction(ctx *fiber.Ctx) error {
 
 	err := ctx.BodyParser(&body)
 	if err != nil {
-		return ctx.Status(400).JSON(fiber.Map{"status": "Failed", "message": "Periksa kembali inputan anda", "data": nil})
+		return ctx.Status(400).JSON(fiber.Map{"status": "Failed", "message": "Please review your input!", "data": nil})
 	}
 
 	if body.Type == "debet" || body.Type == "credit" {
 		err := h.cashflowService.AddTransaction(ctx, body)
 		if err != nil {
-			return ctx.Status(500).JSON(fiber.Map{"status": "Failed", "message": "Server sedang bermasalah, silahkan coba beberapa saat lagi", "data": nil})
+			return ctx.Status(500).JSON(fiber.Map{"status": "Failed", "message": err.Error()})
 		}
 	} else {
-		return ctx.Status(400).JSON(fiber.Map{"status": "Failed", "message": "Tipe transasksi salah", "data": nil})
+		return ctx.Status(400).JSON(fiber.Map{"status": "Failed", "message": "Wrong transaction type", "data": nil})
 	}
 
 	return ctx.Status(201).
-		JSON(fiber.Map{"status": "success", "message": "Transaksi baru telah ditambahkan"})
+		JSON(fiber.Map{"status": "success", "message": "New transaction has been added"})
 }
 
 func (h Handler) CashflowHistory(ctx *fiber.Ctx) error {

@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
 	utilities "gitlab.com/cinco/utils"
@@ -19,7 +20,7 @@ type Service struct {
 	account            interfaces.AccountRepositoryInterface
 }
 
-func (s Service) TotalCashflow(userUUID string, startDate time.Time, endDate time.Time) (model.Total, error) {
+func (s Service) TotalCashflow(userUUID string, startDate time.Time, endDate time.Time) (response.Total, error) {
 	return s.cashflowRepository.FindTotal(userUUID, utilities.Bod(startDate), utilities.Eod(endDate))
 }
 
@@ -31,13 +32,14 @@ func (s Service) AddTransaction(ctx *fiber.Ctx, body model.Cashflow) error {
 		return err
 	}
 
+	fmt.Println("bug 3")
 	if body.Type == "debet" {
 		balance = balance + body.Amount
 	} else if body.Type == "credit" {
 		if balance > body.Amount {
 			balance = balance - body.Amount
 		} else {
-			return errors.New("saldo tidak mencukupi")
+			return errors.New("not enough balance")
 		}
 	}
 
@@ -45,11 +47,12 @@ func (s Service) AddTransaction(ctx *fiber.Ctx, body model.Cashflow) error {
 	if err != nil {
 		return err
 	}
-
+	fmt.Println("bug 1")
 	err = s.cashflowRepository.PostTransaction(ctx, &body)
 	if err != nil {
 		return err
 	}
+	fmt.Println("bug 2")
 	return nil
 }
 
@@ -120,7 +123,7 @@ func (s Service) DeleteCashflow(ctx *fiber.Ctx, cashflowid string, paramsIdAccou
 	} else if cashflowTypes == "debet" {
 		balance = balance - amountHistory
 	} else {
-		return errors.New("tipe transaksi tidak bisa terbaca")
+		return errors.New("transaction type is wrong")
 	}
 
 	err = s.cashflowRepository.RepoUpdateBalance(ctx, balance, paramsIdAccount)

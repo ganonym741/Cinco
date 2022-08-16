@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"gitlab.com/cinco/app/response"
 	"time"
 
 	utilities "gitlab.com/cinco/utils"
@@ -25,7 +26,7 @@ func (r Repository) FindByAccount(userUUID string, tipe string, startDate time.T
 		query += " AND c.issued_at BETWEEN '" + startDate.Format(utilities.DateTimeFormat) + "' AND '" + endDate.Format(utilities.DateTimeFormat) + "'"
 	}
 
-	query += " ORDER BY c.issued_at"
+	query += " AND c.deleted_at IS NULL ORDER BY c.issued_at"
 
 	var cashflows []model.Cashflow
 
@@ -43,8 +44,9 @@ func (r Repository) PostTransaction(ctx *fiber.Ctx, body *model.Cashflow) error 
 }
 
 func (r Repository) DeleteCashflow(ctx *fiber.Ctx, params string) error {
+	var cashflow model.Cashflow
 
-	err := r.Db.Raw("DELETE FROM public.cashflows WHERE id = ?", params).Error
+	err := r.Db.Where("id = ?", params).Delete(&cashflow).Error
 
 	return err
 }
@@ -77,18 +79,18 @@ func (r Repository) GetHistoryandAmountBefore(ctx *fiber.Ctx, params string) (in
 	return Result.Amount, Result.Type, nil
 }
 
-func (r Repository) FindTotal(userUUID string, startDate time.Time, endDate time.Time) (model.Total, error) {
+func (r Repository) FindTotal(userUUID string, startDate time.Time, endDate time.Time) (response.Total, error) {
 	var query = "SELECT SUM(CASE WHEN c.type = 'credit' THEN c.amount ELSE 0 END) as credit, " +
 		"SUM(CASE WHEN c.type = 'debet' THEN c.amount ELSE 0 END) as debet " +
 		"FROM cashflows c " +
 		"INNER JOIN accounts a ON c.account_id  = a.id INNER JOIN users u ON a.user_id = u.id " +
-		"WHERE u.id = '" + userUUID + "'"
+		"WHERE u.id = '" + userUUID + "' AND c.deleted_at IS NULL "
 
 	if !startDate.IsZero() && !endDate.IsZero() {
 		query += " AND c.issued_at BETWEEN '" + startDate.Format(utilities.DateTimeFormat) + "' AND '" + endDate.Format(utilities.DateTimeFormat) + "'"
 	}
 
-	var totals = model.Total{Debet: 0, Credit: 0}
+	var totals = response.Total{Debet: 0, Credit: 0}
 
 	err := r.Db.Raw(query).Scan(&totals).Error
 	if err != nil {

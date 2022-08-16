@@ -7,6 +7,7 @@ import (
 
 type CincoAccount interface {
 	AccountActivation(c *fiber.Ctx) error
+	GetBalance(ctx *fiber.Ctx) error
 }
 
 type AccountHandler struct {
@@ -69,6 +70,21 @@ func (a AccountHandler) AccountActivation(ctx *fiber.Ctx) error {
 		"message": "bad url request.",
 		"closure": "please contact your system administrator.",
 	})
+}
+
+func (a AccountHandler) GetBalance(ctx *fiber.Ctx) error {
+	account_id := ctx.Params("accountId")
+
+	balance, err := a.AccountService.GetBalance(ctx, account_id)
+	if err != nil {
+		return ctx.Status(400).
+			JSON(fiber.Map{
+				"status":   "failed",
+				"messages": "something wrong",
+			})
+	}
+
+	return ctx.Status(200).JSON(fiber.Map{"status": "success", "messages": "account balance retrieved", "balance": balance})
 }
 
 func NewAccountHandler(accountService interfaces.AccountServiceInterface, serviceInterface interfaces.UserServiceInterface) CincoAccount {

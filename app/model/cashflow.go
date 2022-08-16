@@ -16,10 +16,4 @@ type Cashflow struct {
 	IssuedAt    time.Time  `json:"issued_at,omitempty"`
 	CreatedAt   time.Time  `json:"created_at,omitempty"`
 	UpdatedAt   *time.Time `json:"updated_at,omitempty"`
-	DeletedAt   DeletedAt  `gorm:"index" json:"deleted_at,omitempty"`
-}
-
-type Total struct {
-	Debet  int `json:"debet,omitempty"`
-	Credit int `json:"credit,omitempty"`
 }

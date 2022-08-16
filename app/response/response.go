@@ -53,4 +53,9 @@ type (
 		Description string `json:"description,omitempty"`
 		Amount      int    `json:"amount,omitempty"`
 	}
+
+	Total struct {
+		Debet  int `json:"debet,omitempty"`
+		Credit int `json:"credit,omitempty"`
+	}
 )
