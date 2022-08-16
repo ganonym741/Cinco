@@ -44,7 +44,6 @@ func (r Repository) PostTransaction(ctx *fiber.Ctx, body *model.Cashflow) error 
 
 func (r Repository) DeleteCashflow(ctx *fiber.Ctx, params string) error {
 	var cashflow model.Cashflow
-	r.Db.Model(&cashflow).Where("id = ?", params).Update("deleted_at", time.Now())
 
 	err := r.Db.Where("id = ?", params).Delete(&cashflow).Error
 
