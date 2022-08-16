@@ -43,8 +43,8 @@ func (r Repository) PostTransaction(ctx *fiber.Ctx, body *model.Cashflow) error 
 }
 
 func (r Repository) DeleteCashflow(ctx *fiber.Ctx, params string) error {
-
-	err := r.Db.Raw("DELETE FROM public.cashflows WHERE id = ?", params).Error
+	var cashflow model.Cashflow
+	err := r.Db.Where("id = ?", params).Delete(&cashflow).Error
 
 	return err
 }
