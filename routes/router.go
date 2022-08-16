@@ -33,7 +33,7 @@ func AllRouter(app *fiber.App, db *gorm.DB) {
 
 	app.Use(utilities.TokenVerify())
 
-	api.Get("/account/balance", utilities.Authorization(true), accountHandler.GetBalance)
+	api.Get("/account/balance/:accountId", utilities.Authorization(true), accountHandler.GetBalance)
 
 	api.Get("/user/profile", utilities.Authorization(true), userHandler.UserProfile)
 	api.Post("/user/logout", utilities.Authorization(true), userHandler.UserLogout)
