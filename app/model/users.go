@@ -16,4 +16,5 @@ type User struct {
 	Status     bool       `json:"status,omitempty"`
 	CreatedAt  time.Time  `json:"created_at,omitempty"`
 	UpdatedAt  *time.Time `json:"updated_at,omitempty"`
+	DeletedAt  DeletedAt  `gorm:"index" json:"deleted_at,omitempty"`
 }

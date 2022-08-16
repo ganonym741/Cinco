@@ -48,4 +48,9 @@ type (
 		AccountId string `json:"account_id"`
 		Balance   string `json:"balance"`
 	}
+
+	ResponseCashflow struct {
+		Description string `json:"description,omitempty"`
+		Amount      int    `json:"amount,omitempty"`
+	}
 )

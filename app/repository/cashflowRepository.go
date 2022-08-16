@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"fmt"
 	"time"
 
 	utilities "gitlab.com/cinco/utils"
@@ -27,7 +26,6 @@ func (r Repository) FindByAccount(userUUID string, tipe string, startDate time.T
 	}
 
 	query += " ORDER BY c.issued_at"
-	//fmt.Println(query)
 
 	var cashflows []model.Cashflow
 
@@ -40,9 +38,7 @@ func (r Repository) FindByAccount(userUUID string, tipe string, startDate time.T
 }
 
 func (r Repository) PostTransaction(ctx *fiber.Ctx, body *model.Cashflow) error {
-	fmt.Println("ini beody", body)
 	err := r.Db.Create(body).Error
-	fmt.Println(err)
 	return err
 }
 
@@ -67,26 +63,39 @@ func (r Repository) RepoUpdateBalance(ctx *fiber.Ctx, updatebalance int, paramsI
 	return err
 }
 
-func (r Repository) RepoUpdateBalance2(ctx *fiber.Ctx, amountAffected int, paramsIdAccount string) error {
-
-	err := r.Db.Raw("UPDATE public.accounts SET balance = balance + ? WHERE id = ?", amountAffected, paramsIdAccount).Error
-
-	return err
-}
-
-func (r Repository) GetHistoryandAmountBefore(ctx *fiber.Ctx, params string) (int, string, int, error) {
+func (r Repository) GetHistoryandAmountBefore(ctx *fiber.Ctx, params string) (int, string, error) {
 	var Result struct {
-		Amount         int    `json:"amount"`
-		Type           string `json:"type"`
-		BalanceHistory int    `json:"balance_history"`
+		Amount int    `json:"amount"`
+		Type   string `json:"type"`
 	}
 
-	// err := r.Db.Table("cashflows").Select("amount", "type").Where("user_id = ?", params).Scan(result).Error
 	err := r.Db.Raw("SELECT amount, type, balance_history FROM cashflows WHERE id = ?", params).Scan(&Result).Error
-	fmt.Println("err history before", err)
-	fmt.Println("result2", Result)
+	if err != nil {
+		return 0, "", err
+	}
 
-	return Result.Amount, Result.Type, Result.BalanceHistory, nil
+	return Result.Amount, Result.Type, nil
+}
+
+func (r Repository) FindTotal(userUUID string, startDate time.Time, endDate time.Time) (model.Total, error) {
+	var query = "SELECT SUM(CASE WHEN c.type = 'credit' THEN c.amount ELSE 0 END) as credit, " +
+		"SUM(CASE WHEN c.type = 'debet' THEN c.amount ELSE 0 END) as debet " +
+		"FROM cashflows c " +
+		"INNER JOIN accounts a ON c.account_id  = a.id INNER JOIN users u ON a.user_id = u.id " +
+		"WHERE u.id = '" + userUUID + "'"
+
+	if !startDate.IsZero() && !endDate.IsZero() {
+		query += " AND c.issued_at BETWEEN '" + startDate.Format(utilities.DateTimeFormat) + "' AND '" + endDate.Format(utilities.DateTimeFormat) + "'"
+	}
+
+	var totals = model.Total{Debet: 0, Credit: 0}
+
+	err := r.Db.Raw(query).Scan(&totals).Error
+	if err != nil {
+		return totals, err
+	}
+
+	return totals, nil
 }
 
 func NewCashflowRepository(db *gorm.DB) interfaces.CashflowRepositoryInterface {
