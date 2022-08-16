@@ -17,8 +17,3 @@ type Cashflow struct {
 	CreatedAt   time.Time  `json:"created_at,omitempty"`
 	UpdatedAt   *time.Time `json:"updated_at,omitempty"`
 }
-
-type Total struct {
-	Debet  int `json:"debet,omitempty"`
-	Credit int `json:"credit,omitempty"`
-}
