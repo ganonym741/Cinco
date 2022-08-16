@@ -20,7 +20,7 @@ type Service struct {
 	account            interfaces.AccountRepositoryInterface
 }
 
-func (s Service) TotalCashflow(userUUID string, startDate time.Time, endDate time.Time) (model.Total, error) {
+func (s Service) TotalCashflow(userUUID string, startDate time.Time, endDate time.Time) (response.Total, error) {
 	return s.cashflowRepository.FindTotal(userUUID, utilities.Bod(startDate), utilities.Eod(endDate))
 }
 

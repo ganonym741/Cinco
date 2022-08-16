@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"gitlab.com/cinco/app/response"
 	"time"
 
 	utilities "gitlab.com/cinco/utils"
@@ -78,7 +79,7 @@ func (r Repository) GetHistoryandAmountBefore(ctx *fiber.Ctx, params string) (in
 	return Result.Amount, Result.Type, nil
 }
 
-func (r Repository) FindTotal(userUUID string, startDate time.Time, endDate time.Time) (model.Total, error) {
+func (r Repository) FindTotal(userUUID string, startDate time.Time, endDate time.Time) (response.Total, error) {
 	var query = "SELECT SUM(CASE WHEN c.type = 'credit' THEN c.amount ELSE 0 END) as credit, " +
 		"SUM(CASE WHEN c.type = 'debet' THEN c.amount ELSE 0 END) as debet " +
 		"FROM cashflows c " +
@@ -89,7 +90,7 @@ func (r Repository) FindTotal(userUUID string, startDate time.Time, endDate time
 		query += " AND c.issued_at BETWEEN '" + startDate.Format(utilities.DateTimeFormat) + "' AND '" + endDate.Format(utilities.DateTimeFormat) + "'"
 	}
 
-	var totals = model.Total{Debet: 0, Credit: 0}
+	var totals = response.Total{Debet: 0, Credit: 0}
 
 	err := r.Db.Raw(query).Scan(&totals).Error
 	if err != nil {
