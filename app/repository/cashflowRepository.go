@@ -25,7 +25,7 @@ func (r Repository) FindByAccount(userUUID string, tipe string, startDate time.T
 		query += " AND c.issued_at BETWEEN '" + startDate.Format(utilities.DateTimeFormat) + "' AND '" + endDate.Format(utilities.DateTimeFormat) + "'"
 	}
 
-	query += " ORDER BY c.issued_at"
+	query += " AND c.deleted_at IS NULL ORDER BY c.issued_at"
 
 	var cashflows []model.Cashflow
 
@@ -82,7 +82,7 @@ func (r Repository) FindTotal(userUUID string, startDate time.Time, endDate time
 		"SUM(CASE WHEN c.type = 'debet' THEN c.amount ELSE 0 END) as debet " +
 		"FROM cashflows c " +
 		"INNER JOIN accounts a ON c.account_id  = a.id INNER JOIN users u ON a.user_id = u.id " +
-		"WHERE u.id = '" + userUUID + "'"
+		"WHERE u.id = '" + userUUID + "' AND c.deleted_at IS NULL "
 
 	if !startDate.IsZero() && !endDate.IsZero() {
 		query += " AND c.issued_at BETWEEN '" + startDate.Format(utilities.DateTimeFormat) + "' AND '" + endDate.Format(utilities.DateTimeFormat) + "'"
