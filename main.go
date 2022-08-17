@@ -1,6 +1,7 @@
 package main
 
 import (
+	"gitlab.com/cinco/pkg/redis"
 	"io"
 
 	"github.com/gofiber/fiber/v2"
@@ -17,8 +18,9 @@ func main() {
 	})
 
 	db := postgres.ConnectDB()
+	rdb := redis.ConnectRedis()
 
-	routes.AllRouter(app, db)
+	routes.AllRouter(app, db, rdb)
 	app.Listen(":8000")
 }
 

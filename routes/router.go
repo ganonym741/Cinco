@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"github.com/go-redis/redis/v9"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"gitlab.com/cinco/app/repository"
@@ -11,10 +12,10 @@ import (
 	utilities "gitlab.com/cinco/utils"
 )
 
-func AllRouter(app *fiber.App, db *gorm.DB) {
+func AllRouter(app *fiber.App, db *gorm.DB, rdb *redis.Client) {
 	cashflowRepository := repository.NewCashflowRepository(db)
 	accountRepository := repository.NewAccountRepository(db)
-	userRepository := repository.NewUserRepository(db)
+	userRepository := repository.NewUserRepository(db, rdb)
 
 	cashflowService := service.NewCashflowService(cashflowRepository, accountRepository)
 	accountService := service.NewAccountService(accountRepository)

@@ -23,9 +23,16 @@ type ConfJWT struct {
 }
 
 type Configs struct {
-	Dbconfig  ConfDB
-	Jwtconfig ConfJWT
-	Host      string
+	Dbconfig    ConfDB
+	Jwtconfig   ConfJWT
+	RedisConfig ConfRedis
+	Host        string
+}
+
+type ConfRedis struct {
+	Host     string
+	Expired  int
+	Password string
 }
 
 var configs *Configs
@@ -40,6 +47,7 @@ func Config() *Configs {
 	if configs == nil {
 		lock.Lock()
 		JwtExpired, _ := strconv.Atoi(os.Getenv("JWT_EXPIRED_SECOND"))
+		RedisHost := os.Getenv("REDIS_HOST")
 
 		configs = &Configs{
 			Dbconfig: ConfDB{
@@ -52,6 +60,11 @@ func Config() *Configs {
 			Jwtconfig: ConfJWT{
 				Secret:  os.Getenv("JWT_SECRET"),
 				Expired: JwtExpired,
+			},
+			RedisConfig: ConfRedis{
+				Host:     RedisHost,
+				Expired:  JwtExpired,
+				Password: "",
 			},
 			Host: os.Getenv("HOST"),
 		}

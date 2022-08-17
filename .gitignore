@@ -1,5 +1,6 @@
 .idea
 .vscode
+.env
 cinco.postman_environment.json
 cinco.postman_collection
 Dockerfile

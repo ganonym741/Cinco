@@ -1,16 +1,23 @@
 package repository
 
 import (
+	"context"
+	"fmt"
+	"github.com/go-redis/redis/v9"
 	"github.com/gofiber/fiber/v2"
 	"gitlab.com/cinco/app/model"
 	"gitlab.com/cinco/app/repository/interfaces"
 	"gitlab.com/cinco/app/response"
+	"log"
+	"os"
+	"time"
 
 	"gorm.io/gorm"
 )
 
 type UserRepository struct {
-	Db *gorm.DB
+	Db  *gorm.DB
+	Rdb *redis.Client
 }
 
 func (u UserRepository) UserRegister(ctx *fiber.Ctx, params model.User) error {
@@ -47,8 +54,41 @@ func (u UserRepository) CheckUser(ctx *fiber.Ctx, paramsUsername, paramsEmail st
 	return user, err
 }
 
-func NewUserRepository(db *gorm.DB) interfaces.UserRepositoryInterface {
+func (u UserRepository) SetRedis(key, val string, ttl int) {
+	op1 := u.Rdb.Set(context.Background(), key, val, time.Duration(ttl)*time.Second)
+
+	if err := op1.Err(); err != nil {
+		fmt.Printf("unable to SET data. error: %v", err)
+		return
+	}
+	log.Println("set operation success")
+}
+
+func (u UserRepository) DelRedis(key string) {
+	ctx := context.Background()
+
+	//searchPattern := key
+
+	if len(os.Args) > 1 {
+		key = os.Args[1]
+	}
+	//var foundedRecordCount int = 0
+	iter := u.Rdb.Scan(ctx, 0, key, 0).Iterator()
+	fmt.Printf("YOUR SEARCH PATTERN= %s\n", key)
+	for iter.Next(ctx) {
+		fmt.Printf("Deleted= %s\n", iter.Val())
+		u.Rdb.Del(ctx, iter.Val())
+		//foundedRecordCount++
+	}
+	if err := iter.Err(); err != nil {
+		panic(err)
+	}
+	//fmt.Printf("Deleted Count %d\n", foundedRecordCount)
+}
+
+func NewUserRepository(db *gorm.DB, rdb *redis.Client) interfaces.UserRepositoryInterface {
 	return &UserRepository{
-		Db: db,
+		Db:  db,
+		Rdb: rdb,
 	}
 }

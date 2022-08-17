@@ -11,7 +11,7 @@ type UserServiceInterface interface {
 	FindByID(userUUID string) model.User
 	Update(user model.User) error
 	UserRegister(ctx *fiber.Ctx, params *param.User) (*response.User, error)
-	UserLogout(ctx *fiber.Ctx, params string) (*response.LogoutResponse, error)
+	UserLogout(ctx *fiber.Ctx) (*response.LogoutResponse, error)
 	UserLogin(ctx *fiber.Ctx, params *param.Login) (*response.LoginResponse, error)
 	GetUserDetail(ctx *fiber.Ctx, userid string) (*response.ProfileDetail, error)
 }

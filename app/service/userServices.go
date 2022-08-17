@@ -2,7 +2,6 @@ package service
 
 import (
 	"errors"
-
 	"strings"
 	"time"
 
@@ -108,6 +107,8 @@ func (u UserService) UserLogin(ctx *fiber.Ctx, params *param.Login) (*response.L
 
 	token := utilities.CreateToken(result)
 
+	u.userRepository.SetRedis(token, params.Identity, configs.Config().RedisConfig.Expired)
+
 	return &response.LoginResponse{
 		Status:   "success",
 		Messages: "User data retrieved",
@@ -115,17 +116,20 @@ func (u UserService) UserLogin(ctx *fiber.Ctx, params *param.Login) (*response.L
 	}, nil
 }
 
-func (u UserService) UserLogout(ctx *fiber.Ctx, params string) (*response.LogoutResponse, error) {
-	configs := configs.Config()
+func (u UserService) UserLogout(ctx *fiber.Ctx) (*response.LogoutResponse, error) {
+	//config := configs.Config()
 	token := strings.Split(ctx.Get("Authorization"), " ")
-	claim, _ := utilities.ExtractClaims(configs.Jwtconfig.Secret, token[1])
 
-	if claim["userid"] != params {
-		var err error
-		return nil, err
-	}
+	u.userRepository.DelRedis(token[1])
 
-	claim["exp"] = -1
+	//claim, _ := utilities.ExtractClaims(config.Jwtconfig.Secret, token[1])
+	//
+	//if claim["userid"] != params {
+	//	var err error
+	//	return nil, err
+	//}
+	//
+	//claim["exp"] = -1
 
 	return &response.LogoutResponse{
 		Status:   "success",
