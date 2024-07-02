@@ -1,8 +1,9 @@
 package main
 
 import (
-	"gitlab.com/cinco/pkg/redis"
 	"io"
+
+	"gitlab.com/cinco/pkg/redis"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/template/html"

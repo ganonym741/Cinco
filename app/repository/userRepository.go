@@ -3,14 +3,15 @@ package repository
 import (
 	"context"
 	"fmt"
+	"log"
+	"os"
+	"time"
+
 	"github.com/go-redis/redis/v9"
 	"github.com/gofiber/fiber/v2"
 	"gitlab.com/cinco/app/model"
 	"gitlab.com/cinco/app/repository/interfaces"
 	"gitlab.com/cinco/app/response"
-	"log"
-	"os"
-	"time"
 
 	"gorm.io/gorm"
 )
